@@ -1,6 +1,10 @@
 package com.horizon.engine.graphics.shader;
 
+import com.horizon.engine.Window;
 import com.horizon.engine.common.file.File;
+import com.horizon.engine.graphics.hud.Canvas;
+import com.horizon.engine.graphics.object.Camera;
+import com.horizon.engine.graphics.object.scene.Scene;
 import com.horizon.engine.graphics.shader.uniform.Uniform;
 import lombok.Data;
 import org.joml.Matrix4f;
@@ -62,6 +66,10 @@ public @Data abstract class ShaderProgram {
         glDeleteShader(geometryShaderID);
         glDeleteShader(fragmentShaderID);
     }
+
+    public abstract void render(Window window, Camera camera, Scene scene, Canvas canvas, Vector3f ambientLight);
+
+    public abstract void initialize();
 
     protected void storeAllUniformLocations(Uniform... uniforms){
         for(Uniform uniform : uniforms){

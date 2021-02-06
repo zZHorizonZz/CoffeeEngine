@@ -1,6 +1,7 @@
 package com.horizon.engine;
 
 import com.google.common.flogger.FluentLogger;
+import com.horizon.engine.event.EventManager;
 import com.horizon.engine.input.InputManager;
 import com.horizon.engine.input.other.MouseInput;
 import com.horizon.engine.model.ModelManager;
@@ -25,6 +26,7 @@ public class GameEngine implements Runnable {
     @Getter private InputManager inputManager;
     @Getter private ModelManager modelManager;
     @Getter private ToolManager toolManager;
+    @Getter private EventManager eventManager;
 
     public GameEngine(String windowTitle, int width, int height, boolean vSync, IGameLogic gameLogic) throws Exception {
         window = new Window(this, windowTitle, width, height, vSync);
@@ -55,6 +57,7 @@ public class GameEngine implements Runnable {
         inputManager = new InputManager(this);
         modelManager = new ModelManager(this);
         toolManager = new ToolManager(this);
+        eventManager = new EventManager(this);
 
         //Final initialization
         ((DummyGame)gameLogic).assignGameEngine(this); //Todo create abstract class for game itself.

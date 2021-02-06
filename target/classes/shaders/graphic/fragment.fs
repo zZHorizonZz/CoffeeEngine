@@ -166,4 +166,8 @@ void main()
     }
 
     fragColor = ambientC * vec4(ambientLight, 1) + diffuseSpecularComp;
+
+    //if ( outSelected > 0 ) {
+    //    fragColor = vec4(fragColor.x, fragColor.y, 1, 1);
+    //}
 }

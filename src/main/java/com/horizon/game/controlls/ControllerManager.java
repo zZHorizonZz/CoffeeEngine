@@ -3,7 +3,10 @@ package com.horizon.game.controlls;
 import com.horizon.engine.AbstractManager;
 import com.horizon.engine.GameEngine;
 import com.horizon.engine.Window;
+import com.horizon.engine.common.RaycastDisplay;
 import com.horizon.engine.graphics.object.Camera;
+import com.horizon.engine.graphics.object.GameObject;
+import com.horizon.engine.graphics.object.hud.text.TextView;
 import com.horizon.engine.input.other.MouseInput;
 import com.horizon.game.DummyGame;
 import lombok.Getter;
@@ -13,10 +16,10 @@ import org.lwjgl.glfw.GLFW;
 
 public class ControllerManager extends AbstractManager {
 
-    private final DummyGame game;
+    @Getter private final DummyGame game;
 
-    @Getter
-    private Camera camera;
+    @Getter private Camera camera;
+    @Getter private RaycastDisplay raycast;
 
     protected Vector3f cameraMovement;
     private static final float MOUSE_SENSITIVITY = 0.2f;
@@ -56,6 +59,8 @@ public class ControllerManager extends AbstractManager {
         } else if (window.isKeyPressed(GLFW.GLFW_KEY_X)) {
             cameraMovement.y = 1;
         }
+
+        raycast = new RaycastDisplay();
     }
 
     public void onUpdate(MouseInput mouseInput) {
@@ -65,8 +70,16 @@ public class ControllerManager extends AbstractManager {
         camera.movePosition(cameraMovement.x * CAMERA_POS_STEP, cameraMovement.y * CAMERA_POS_STEP, cameraMovement.z * CAMERA_POS_STEP);
 
         if (mouseInput.isRightButtonPressed()) {
-            Vector2f rotVec = mouseInput.getDisplVec();
+            Vector2f rotVec = mouseInput.getDisplayVector();
             camera.moveRotation(rotVec.x * MOUSE_SENSITIVITY, rotVec.y * MOUSE_SENSITIVITY, 0);
+        }
+
+        camera.updateViewMatrix();
+
+        if (mouseInput.isLeftButtonPressed()) {
+            GameObject gameObject = raycast.selectGameObject(getGame().getGameScene().getSceneObjects().values(), getGame().getGameEngine().getWindow(), mouseInput.getCurrentPosition(), getCamera());
+
+            ((TextView) getGame().getCanvas().getCanvasObjects().get("test")).getTextComponent().setText("Object Selected -> " + gameObject.getPosition().x() + " Y: " + gameObject.getPosition().y() + " Z: " + gameObject.getPosition().z());
         }
     }
 }

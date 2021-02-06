@@ -1,11 +1,20 @@
 package com.horizon.engine;
 
 import com.horizon.engine.common.Color;
+import com.horizon.engine.event.event.ScreenResizeEvent;
 import lombok.Getter;
+import org.joml.Matrix4f;
+import org.joml.Vector2f;
 import org.joml.Vector4f;
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
+import org.lwjgl.glfw.GLFWFramebufferSizeCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
+import org.lwjgl.system.MemoryUtil;
+
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -13,31 +22,40 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Window {
 
+    private static final float FOV = (float) Math.toRadians(60.0f);
+    private static final float Z_NEAR = 0.01f;
+    private static final float Z_FAR = 1000.f;
+
     @Getter private final GameEngine gameEngine;
     @Getter private final String title;
 
-    @Getter private int width;
-    @Getter private int height;
+    @Getter private static int width;
+    @Getter private static int height;
 
     @Getter private long windowHandle;
 
     private boolean resized;
     private boolean vSync;
 
+    private Matrix4f projectionMatrix;
+
+    protected GLFWFramebufferSizeCallback framebufferSizeCallback;
+
     public Window(GameEngine gameEngine, String title, int width, int height, boolean vSync) {
         this.gameEngine = gameEngine;
         this.title = title;
-        this.width = width;
-        this.height = height;
+        Window.width = width;
+        Window.height = height;
         this.vSync = vSync;
         this.resized = false;
+        projectionMatrix = new Matrix4f();
     }
 
     public void init() {
         GLFWErrorCallback.createPrint(System.err).set();
 
         if (!glfwInit()) {
-            throw new IllegalStateException("Unable to initialize GLFW");
+            throw new IllegalStateException("Unable to initialize GLFW.");
         }
 
         glfwDefaultWindowHints();
@@ -50,17 +68,21 @@ public class Window {
 
         windowHandle = glfwCreateWindow(width, height, title, NULL, NULL);
         if (windowHandle == NULL) {
-            throw new RuntimeException("Failed to create the GLFW window");
+            throw new RuntimeException("Failed to create the GLFW window.");
         }
 
-        glfwSetFramebufferSizeCallback(windowHandle, (window, width, height) -> {
-            this.width = width;
-            this.height = height;
+        framebufferSizeCallback = glfwSetFramebufferSizeCallback(windowHandle, (window, width, height) -> {
+            Window.width = width;
+            Window.height = height;
             this.setResized(true);
         });
 
-        GLFWVidMode videomode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-        glfwSetWindowPos(windowHandle, (videomode.width() - width) / 2, (videomode.height() - height) / 2);
+        GLFWVidMode videoMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+        if(videoMode == null){
+            throw new RuntimeException("Failed to recognize video mode.");
+        }
+
+        glfwSetWindowPos(windowHandle, (videoMode.width() - width) / 2, (videoMode.height() - height) / 2);
 
         glfwMakeContextCurrent(windowHandle);
 
@@ -69,11 +91,20 @@ public class Window {
         }
 
         glfwShowWindow(windowHandle);
+        enableCapabilities();
+    }
 
+    private void enableCapabilities(){
         GL.createCapabilities();
 
         glClearColor(0.2f, 0.5f, 0.65f, 1.0f);
         glEnable(GL_DEPTH_TEST);
+
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
     }
 
     public void setClearColor(Color color) {
@@ -83,6 +114,15 @@ public class Window {
 
     public void setClearColor(float r, float g, float b, float alpha) {
         glClearColor(r, g, b, alpha);
+    }
+
+    public Matrix4f getProjectionMatrix() {
+        return projectionMatrix;
+    }
+
+    public Matrix4f updateProjectionMatrix() {
+        float aspectRatio = (float)width / (float)height;
+        return projectionMatrix.setPerspective(FOV, aspectRatio, Z_NEAR, Z_FAR);
     }
 
     public boolean isKeyPressed(int keyCode) {
@@ -109,12 +149,24 @@ public class Window {
         return vSync;
     }
 
-    public void setvSync(boolean vSync) {
+    public void setVSync(boolean vSync) {
         this.vSync = vSync;
     }
 
     public void update() {
         glfwSwapBuffers(windowHandle);
         glfwPollEvents();
+    }
+
+    public Vector2f getScreenSize(){
+        IntBuffer w = MemoryUtil.memAllocInt(1);
+        IntBuffer h = MemoryUtil.memAllocInt(1);
+
+        glfwGetWindowSize(windowHandle, w, h);
+
+        int width = w.get(0);
+        int height = h.get(0);
+
+        return new Vector2f(width, height);
     }
 }

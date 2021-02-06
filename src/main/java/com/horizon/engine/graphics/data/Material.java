@@ -24,6 +24,10 @@ public @Data class Material {
         this.reflectance = 0;
     }
 
+    public Material(Color colour) {
+        this(colour, colour, colour, null, 0);
+    }
+
     public Material(Color colour, float reflectance) {
         this(colour, colour, colour, null, reflectance);
     }

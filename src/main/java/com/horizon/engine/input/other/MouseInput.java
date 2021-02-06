@@ -1,17 +1,16 @@
 package com.horizon.engine.input.other;
 
 import com.horizon.engine.Window;
+import lombok.Getter;
 import org.joml.Vector2d;
 import org.joml.Vector2f;
 import static org.lwjgl.glfw.GLFW.*;
 
 public class MouseInput {
 
-    private final Vector2d previousPos;
-
-    private final Vector2d currentPos;
-
-    private final Vector2f displVec;
+    @Getter private final Vector2d previousPosition;
+    @Getter private final Vector2d currentPosition;
+    @Getter private final Vector2f displayVector;
 
     private boolean inWindow = false;
 
@@ -20,15 +19,15 @@ public class MouseInput {
     private boolean rightButtonPressed = false;
 
     public MouseInput() {
-        previousPos = new Vector2d(-1, -1);
-        currentPos = new Vector2d(0, 0);
-        displVec = new Vector2f();
+        previousPosition = new Vector2d(-1, -1);
+        currentPosition = new Vector2d(0, 0);
+        displayVector = new Vector2f();
     }
 
     public void init(Window window) {
         glfwSetCursorPosCallback(window.getWindowHandle(), (windowHandle, xpos, ypos) -> {
-            currentPos.x = xpos;
-            currentPos.y = ypos;
+            currentPosition.x = xpos;
+            currentPosition.y = ypos;
         });
         glfwSetCursorEnterCallback(window.getWindowHandle(), (windowHandle, entered) -> {
             inWindow = entered;
@@ -39,27 +38,23 @@ public class MouseInput {
         });
     }
 
-    public Vector2f getDisplVec() {
-        return displVec;
-    }
-
     public void input(Window window) {
-        displVec.x = 0;
-        displVec.y = 0;
-        if (previousPos.x > 0 && previousPos.y > 0 && inWindow) {
-            double deltax = currentPos.x - previousPos.x;
-            double deltay = currentPos.y - previousPos.y;
+        displayVector.x = 0;
+        displayVector.y = 0;
+        if (previousPosition.x > 0 && previousPosition.y > 0 && inWindow) {
+            double deltax = currentPosition.x - previousPosition.x;
+            double deltay = currentPosition.y - previousPosition.y;
             boolean rotateX = deltax != 0;
             boolean rotateY = deltay != 0;
             if (rotateX) {
-                displVec.y = (float) deltax;
+                displayVector.y = (float) deltax;
             }
             if (rotateY) {
-                displVec.x = (float) deltay;
+                displayVector.x = (float) deltay;
             }
         }
-        previousPos.x = currentPos.x;
-        previousPos.y = currentPos.y;
+        previousPosition.x = currentPosition.x;
+        previousPosition.y = currentPosition.y;
     }
 
     public boolean isLeftButtonPressed() {

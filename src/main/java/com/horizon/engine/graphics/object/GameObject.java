@@ -6,6 +6,7 @@ import com.horizon.engine.component.Component;
 import com.horizon.engine.component.ComponentType;
 import com.horizon.engine.component.component.Mesh;
 import lombok.Data;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.LinkedHashMap;
@@ -21,7 +22,9 @@ public @Data abstract class GameObject {
 
     private final Vector3f scale;
     private final Vector3f position;
-    private final Vector3f rotation;
+    private final Quaternionf rotation;
+
+    private Boolean selected;
 
     public GameObject(GameEngine gameEngine, String gameObjectName, Mesh mesh) {
         this.gameEngine = gameEngine;
@@ -29,7 +32,7 @@ public @Data abstract class GameObject {
         addComponent(mesh);
         position = new Vector3f();
         scale = new Vector3f(1, 1, 1);
-        rotation = new Vector3f();
+        rotation = new Quaternionf();
     }
 
     public GameObject(GameEngine gameEngine, String gameObjectName) {
@@ -37,11 +40,23 @@ public @Data abstract class GameObject {
         this.gameObjectName = gameObjectName;
         position = new Vector3f();
         scale = new Vector3f(1, 1, 1);
-        rotation = new Vector3f();
+        rotation = new Quaternionf();
     }
 
     public Vector3f getPosition() {
         return position;
+    }
+
+    public float getX(){
+        return getPosition().x();
+    }
+
+    public float getY(){
+        return getPosition().y();
+    }
+
+    public float getZ(){
+        return getPosition().z();
     }
 
     public GameObject setPosition(float x, float y, float z) {
@@ -64,14 +79,12 @@ public @Data abstract class GameObject {
         return this;
     }
 
-    public Vector3f getRotation() {
+    public Quaternionf getRotation() {
         return rotation;
     }
 
-    public GameObject setRotation(float x, float y, float z) {
-        this.rotation.x = x;
-        this.rotation.y = y;
-        this.rotation.z = z;
+    public GameObject setRotation(Quaternionf q) {
+        this.rotation.set(q);
 
         return this;
     }

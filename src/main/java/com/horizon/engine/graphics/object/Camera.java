@@ -1,8 +1,10 @@
 package com.horizon.engine.graphics.object;
 
 import com.horizon.engine.common.Color;
+import com.horizon.engine.graphics.data.Transformation;
 import lombok.Getter;
 import lombok.Setter;
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 public class Camera {
@@ -10,11 +12,14 @@ public class Camera {
     @Getter private final Vector3f position;
     @Getter private final Vector3f rotation;
 
+    @Getter @Setter private Matrix4f viewMatrix;
+
     @Getter @Setter private Color backgroundColor = Color.BACKGROUND;
 
     public Camera() {
         position = new Vector3f();
         rotation = new Vector3f();
+        viewMatrix = new Matrix4f();
     }
 
     public Camera(Vector3f position, Vector3f rotation) {
@@ -50,5 +55,13 @@ public class Camera {
         rotation.x += offsetX;
         rotation.y += offsetY;
         rotation.z += offsetZ;
+    }
+
+    public Matrix4f getViewMatrix() {
+        return viewMatrix;
+    }
+
+    public Matrix4f updateViewMatrix() {
+        return Transformation.updateGenericViewMatrix(position, rotation, viewMatrix);
     }
 }

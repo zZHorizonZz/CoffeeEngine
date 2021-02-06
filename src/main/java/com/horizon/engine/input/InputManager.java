@@ -16,8 +16,7 @@ import static org.lwjgl.glfw.GLFW.glfwSetKeyCallback;
 
 public class InputManager extends AbstractManager {
 
-    @Getter
-    private final Map<String, Map.Entry<Method, Object>> updateMap = new HashMap<String, Map.Entry<Method, Object>>();
+    @Getter private final Map<String, Map.Entry<Method, Object>> updateMap = new HashMap<String, Map.Entry<Method, Object>>();
 
     public InputManager(GameEngine engine){
         super(engine, "Input Manager");

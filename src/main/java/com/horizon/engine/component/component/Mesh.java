@@ -1,5 +1,6 @@
 package com.horizon.engine.component.component;
 
+import com.horizon.engine.common.Color;
 import com.horizon.engine.common.UtilModel;
 import com.horizon.engine.component.Component;
 import com.horizon.engine.component.ComponentType;
@@ -14,7 +15,6 @@ import org.lwjgl.system.MemoryUtil;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -27,15 +27,12 @@ import static org.lwjgl.opengl.GL30.*;
 
 public class Mesh extends Component {
 
-    private static final Vector3f DEFAULT_COLOUR = new Vector3f(1.0f, 1.0f, 1.0f);
-
     @Getter private int vaoId;
     @Getter private List<Integer> vboIdList;
 
     @Getter private int vertexCount;
 
     @Getter @Setter private Material material;
-    @Getter @Setter private Vector3f colour;
 
     @Getter private float[] positions;
     @Getter private float[] textureCoordinates;
@@ -51,6 +48,10 @@ public class Mesh extends Component {
     protected int textureVboId;
     protected int normalsVboId;
     protected int indicesVboId;
+
+    public Mesh(){
+        super(ComponentType.MESH);
+    }
 
     public Mesh(float[] positions, float[] textureCoordinates, float[] normals, int[] indices) {
         super(ComponentType.MESH);
@@ -98,7 +99,6 @@ public class Mesh extends Component {
         IntBuffer indicesBuffer = null;
 
         try {
-            colour = Mesh.DEFAULT_COLOUR;
             vertexCount = indices.length;
             vboIdList = new LinkedList<>();
             vaoId = glGenVertexArrays();
@@ -169,15 +169,20 @@ public class Mesh extends Component {
         glDisableVertexAttribArray(2);
         glBindTexture(GL_TEXTURE_2D, 0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
+
         for (int vboId : vboIdList) {
             glDeleteBuffers(vboId);
         }
+
+        glBindVertexArray(0);
+        glDeleteVertexArrays(vaoId);
+    }
+
+    public void cleanUpTexture(){
         Texture texture = material.getTexture();
         if (texture != null) {
             texture.cleanup();
         }
-        glBindVertexArray(0);
-        glDeleteVertexArrays(vaoId);
     }
 
     public Pair<Integer, FloatBuffer> createResourceBuffers(float[] bufferData, int index, int size, int drawType) {

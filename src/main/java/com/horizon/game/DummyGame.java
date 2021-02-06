@@ -7,6 +7,7 @@ import com.horizon.engine.component.ComponentType;
 import com.horizon.engine.component.component.light.Light;
 import com.horizon.engine.graphics.data.Material;
 import com.horizon.engine.graphics.data.Texture;
+import com.horizon.engine.graphics.hud.Canvas;
 import com.horizon.engine.graphics.light.PointLight;
 import com.horizon.engine.graphics.light.SpotLight;
 import com.horizon.engine.graphics.object.Camera;
@@ -26,6 +27,7 @@ public class DummyGame implements IGameLogic {
 
     @Getter private GameEngine gameEngine;
     @Getter private Scene gameScene;
+    @Getter private Canvas canvas;
 
     private final Renderer renderer;
 
@@ -48,8 +50,11 @@ public class DummyGame implements IGameLogic {
     @Override
     public void initialize() throws Exception {
         renderer.initialize(getGameEngine().getWindow());
+
         gameScene = new Scene(getGameEngine());
         gameScene.initialize();
+
+        canvas = new Canvas(getGameEngine());
 
         testManager = new TestManager(getGameEngine());
         controllerManager = new ControllerManager(getGameEngine());
@@ -109,7 +114,7 @@ public class DummyGame implements IGameLogic {
         if(camera == null)
             return;
 
-        renderer.render(window, camera, getGameScene(), ambientLight);
+        renderer.render(window, camera, getGameScene(), getCanvas(), ambientLight);
     }
 
     @Override
@@ -120,6 +125,7 @@ public class DummyGame implements IGameLogic {
                 continue;
 
             gameObject.getMesh().cleanUp();
+            gameObject.getMesh().cleanUpTexture();
         }
     }
 

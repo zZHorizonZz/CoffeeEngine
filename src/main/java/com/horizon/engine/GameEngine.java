@@ -28,6 +28,10 @@ public class GameEngine implements Runnable {
     @Getter private ToolManager toolManager;
     @Getter private EventManager eventManager;
 
+    @Getter private long lastTime = System.currentTimeMillis();
+    @Getter private long currentFramesPerSecond = 0;
+    @Getter private long lastFramesPerSecond = 0;
+
     public GameEngine(String windowTitle, int width, int height, boolean vSync, IGameLogic gameLogic) throws Exception {
         window = new Window(this, windowTitle, width, height, vSync);
         mouseInput = new MouseInput();
@@ -60,7 +64,7 @@ public class GameEngine implements Runnable {
         eventManager = new EventManager(this);
 
         //Final initialization
-        ((DummyGame)gameLogic).assignGameEngine(this); //Todo create abstract class for game itself.
+        ((DummyGame) gameLogic).assignGameEngine(this); //Todo create abstract class for game itself.
         gameLogic.initialize();
     }
 
@@ -70,6 +74,7 @@ public class GameEngine implements Runnable {
         float interval = 1f / TARGET_UPS;
 
         boolean running = true;
+
         while (running && !window.windowShouldClose()) {
             elapsedTime = timer.getElapsedTime();
             accumulator += elapsedTime;
@@ -86,6 +91,8 @@ public class GameEngine implements Runnable {
             if (!window.isvSync()) {
                 sync();
             }
+
+            updateFramesPerSecond();
         }
     }
 
@@ -116,5 +123,19 @@ public class GameEngine implements Runnable {
 
     protected void cleanup() {
         gameLogic.cleanup();
+    }
+
+    protected void updateFramesPerSecond() {
+        if (lastTime + 1000 < getTime()) {
+            lastFramesPerSecond = currentFramesPerSecond;
+            currentFramesPerSecond = 0;
+            lastTime = getTime();
+        }
+
+        currentFramesPerSecond++;
+    }
+
+    public long getTime() {
+        return System.currentTimeMillis();
     }
 }

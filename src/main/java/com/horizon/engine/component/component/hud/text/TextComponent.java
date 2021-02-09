@@ -23,6 +23,8 @@ public class TextComponent extends Component {
     @Getter private float textWidth;
     @Getter private float textHeight;
 
+    @Getter private boolean bold = false;
+
     private static final float ZPOS = 0.0f;
     private static final int VERTICES_PER_QUAD = 4;
 
@@ -38,21 +40,33 @@ public class TextComponent extends Component {
         gameObject.addComponent(buildMesh(getFont().getFont()));
     }
 
-    public void setSize(int size){
+    public void setSize(int size) {
         this.size = size;
 
         if(gameObject.getMesh() == null)
             return;
 
         gameObject.getMesh().cleanUp();
-        //gameObject.getMesh().cleanUpTexture();
         gameObject.getComponents().replace(ComponentType.MESH, buildMesh(getFont().setSize(size)));
+    }
+
+    public void setBold(boolean bold) {
+        this.bold = bold;
+
+        if(gameObject.getMesh() == null)
+            return;
+
+        gameObject.getMesh().cleanUp();
+        gameObject.getComponents().replace(ComponentType.MESH, buildMesh(getFont().getFont()));
     }
 
     private Mesh buildMesh(Font font) {
         List<Float> positions = new ArrayList<>();
         List<Float> textureCoordinates = new ArrayList<>();
         List<Integer> indices   = new ArrayList<>();
+
+        if(isBold())
+            font.setFont(font.getFont().deriveFont(java.awt.Font.BOLD, getSize()));
 
         float[] normals   = new float[0];
         char[] characters = text.toCharArray();

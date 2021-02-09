@@ -16,6 +16,7 @@ import com.horizon.engine.graphics.object.objects.CubeObject;
 import com.horizon.engine.graphics.object.objects.CylinderObject;
 import com.horizon.engine.graphics.object.scene.Scene;
 import com.horizon.engine.input.other.MouseInput;
+import com.horizon.engine.tool.FPSCounter;
 import com.horizon.game.building.house.TestObject;
 import com.horizon.game.controlls.ControllerManager;
 import com.horizon.game.testing.TestManager;
@@ -29,6 +30,8 @@ public class DummyGame implements IGameLogic {
     @Getter private Scene gameScene;
     @Getter private Canvas canvas;
 
+    @Getter private FPSCounter fpsCounter;
+
     private final Renderer renderer;
 
     @Getter private TestManager testManager;
@@ -39,7 +42,6 @@ public class DummyGame implements IGameLogic {
     private float x,y,z;
 
     private Vector3f ambientLight;
-
     private PointLight pointLight;
 
 
@@ -79,6 +81,8 @@ public class DummyGame implements IGameLogic {
 
         getGameScene().initializeObject(pointLight);
         getGameScene().initializeObject(spotLight);
+
+        fpsCounter = new FPSCounter(getGameEngine());
     }
 
     @Override
@@ -104,6 +108,7 @@ public class DummyGame implements IGameLogic {
     public void onUpdate(float interval, MouseInput mouseInput) {
         getControllerManager().onUpdate(mouseInput);
 
+        getFpsCounter().update();
         //player.setPosition(player.getPosition().x + x * 0.01f, player.getPosition().y, player.getPosition().z + z * 0.01f);
         //player.getMesh().updatePositions(UtilModel.upScaleModel(player.getMesh().getPositions(), x == 0 ? 1 : x * 0.01f, 1.0f, z == 0 ? 1 : z * 0.01f));
     }

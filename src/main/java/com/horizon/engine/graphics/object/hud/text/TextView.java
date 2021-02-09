@@ -5,13 +5,8 @@ import com.horizon.engine.component.ComponentType;
 import com.horizon.engine.component.component.hud.text.TextComponent;
 import com.horizon.engine.component.component.hud.text.TextFont;
 import com.horizon.engine.graphics.object.hud.HudObject;
-import lombok.Getter;
-import lombok.Setter;
-import org.joml.Vector2f;
 
 public class TextView extends HudObject {
-
-    @Getter @Setter private boolean centerText = true;
 
     public TextView(GameEngine gameEngine, String text, String name){
         this(gameEngine, text, TextFont.AERIAL, name);
@@ -28,27 +23,41 @@ public class TextView extends HudObject {
 
     @Override
     public void updateObject() {
-        recalculateAnchors();
-
-        if(isCenterText())
-            centerText();
+        recalculate();
     }
 
-    public Vector2f getCenter(){
-        return new Vector2f(getTextComponent().getTextWidth() / 2, getTextComponent().getTextHeight() / 2);
+    @Override
+    public float getWidth() {
+        return getTextComponent().getTextWidth();
     }
 
-    public void centerText(){
-        setPosition(getX() - (getTextComponent().getTextWidth() / 2), getY() - (getTextComponent().getTextHeight() / 2), 0);
+    @Override
+    public float getHeight() {
+        return getTextComponent().getTextHeight();
     }
 
-    public void setSize(int size){
+    @Override
+    public void objectCorrections() {
+        setPosition(getX() - (getWidth() / 2), getY() - (getHeight() / 2), 0);
+    }
+
+    @Override
+    public void setSize(float xSize, float ySize) {
+
+    }
+
+    public void setSize(int size) {
         getTextComponent().setSize(size);
         updateObject();
     }
 
-    public void setText(String text){
+    public void setText(String text) {
         getTextComponent().setText(text);
+        updateObject();
+    }
+
+    public void setBold(boolean bold) {
+        getTextComponent().setBold(bold);
         updateObject();
     }
 

@@ -74,7 +74,7 @@ public @Data abstract class GameObject {
             return this;
 
         Mesh mesh = getMesh();
-        mesh.updatePositions(UtilModel.upScalePositions(mesh.getPositions(), x, y, z));
+        mesh.updatePositions(UtilModel.upScalePositions(mesh.getPositions(), x, y, z), 3);
 
         return this;
     }

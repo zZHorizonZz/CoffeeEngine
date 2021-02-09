@@ -1,37 +1,37 @@
 package com.horizon.engine.graphics.hud;
 
 import com.horizon.engine.GameEngine;
-import com.horizon.engine.common.Font;
+import com.horizon.engine.common.Color;
 import com.horizon.engine.component.component.hud.text.TextFont;
+import com.horizon.engine.data.ApplicationSetting;
 import com.horizon.engine.event.data.EventHandler;
 import com.horizon.engine.event.event.ScreenResizeEvent;
-import com.horizon.engine.graphics.object.GameObject;
 import com.horizon.engine.graphics.object.hud.HudObject;
 import com.horizon.engine.graphics.object.hud.objects.BoxView;
-import com.horizon.engine.graphics.object.hud.orientations.DisplayData;
-import com.horizon.engine.graphics.object.hud.orientations.DisplayPercentage;
+import com.horizon.engine.graphics.object.hud.orientations.AlignmentData;
+import com.horizon.engine.graphics.object.hud.orientations.AlignmentDistance;
+import com.horizon.engine.graphics.object.hud.orientations.AlignmentPercentage;
 import com.horizon.engine.graphics.object.hud.other.DisplayAnchor;
 import com.horizon.engine.graphics.object.hud.text.TextView;
-import javafx.util.Pair;
-import lombok.Data;
+import com.horizon.engine.hud.hud.MenuPrefab;
+import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public @Data class Canvas {
+public class Canvas {
 
-    private final GameEngine gameEngine;
+    @Getter private final GameEngine gameEngine;
 
-    private Map<String, HudObject> canvasObjects = new LinkedHashMap<>();
+    @Getter private final Map<String, HudObject> canvasObjects = new LinkedHashMap<>();
 
     public Canvas(GameEngine gameEngine){
         this.gameEngine = gameEngine;
 
-        TextView textView = createTextView("Test Text", "Test Text", DisplayAnchor.CENTER, new DisplayPercentage(0, -25));
-        textView.setSize(40);
+        MenuPrefab menuPrefab = new MenuPrefab(this, "Debug Menu", 800, 650, DisplayAnchor.CENTER);
 
-        createBoxView();
+        menuPrefab.initialize();
 
         gameEngine.getEventManager().registerEventHandlers(this);
     }
@@ -40,32 +40,34 @@ public @Data class Canvas {
         canvasObjects.put(object.getGameObjectName(), object);
     }
 
-    public TextView createTextView(String name, String text, DisplayAnchor anchor, DisplayData... displayData){
-        return createTextView(name, text, TextFont.AERIAL, anchor, displayData);
+    public TextView createTextView(String name, String text, DisplayAnchor anchor, AlignmentData... alignmentData){
+        return createTextView(name, text, TextFont.IMPACT, anchor, alignmentData);
     }
 
     public TextView createTextView(String name, String text, DisplayAnchor anchor){
-       return createTextView(name, text, TextFont.AERIAL, anchor);
+       return createTextView(name, text, TextFont.IMPACT, anchor);
     }
 
-    public TextView createTextView(String name, String text, TextFont font, DisplayAnchor anchor, DisplayData... displayData){
+    public TextView createTextView(String name, String text, TextFont font, DisplayAnchor anchor, AlignmentData... alignmentData){
         TextView textView = new TextView(getGameEngine(), text, font, name);
 
         textView.setDisplayAnchor(anchor);
-        if(displayData != null)
-            textView.getDisplayDataList().addAll(Arrays.asList(displayData));
+        if(alignmentData != null)
+            textView.getAlignmentDataList().addAll(Arrays.asList(alignmentData));
 
         textView.updateObject();
 
-        canvasObjects.put(name, textView);
+        initializeObject(textView);
 
         return textView;
     }
 
-    public BoxView createBoxView(){
-        BoxView boxView = new BoxView(getGameEngine(), "Test Box", 5, 5);
+    public BoxView createBoxView(String name, Color color, DisplayAnchor displayAnchor, int xSize, int ySize){
+        BoxView boxView = new BoxView(getGameEngine(), name, xSize, ySize);
+        boxView.setDisplayAnchor(displayAnchor);
+        boxView.setColor(color);
 
-        canvasObjects.put("Test Box", boxView);
+        initializeObject(boxView);
 
         return boxView;
     }
@@ -76,6 +78,6 @@ public @Data class Canvas {
             hudObject.updateObject();
         }
 
-        ((TextView) getCanvasObjects().get("Test Text")).setText("Data Text");
+        //((TextView) getCanvasObjects().get("Test Text")).setText("Data Text");
     }
 }

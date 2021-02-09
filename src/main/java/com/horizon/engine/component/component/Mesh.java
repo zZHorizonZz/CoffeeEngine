@@ -1,22 +1,22 @@
 package com.horizon.engine.component.component;
 
-import com.horizon.engine.common.Color;
 import com.horizon.engine.common.UtilModel;
 import com.horizon.engine.component.Component;
 import com.horizon.engine.component.ComponentType;
 import com.horizon.engine.graphics.data.Material;
 import com.horizon.engine.graphics.data.Texture;
 import com.horizon.engine.graphics.data.Vertex;
-import javafx.util.Pair;
 import lombok.Getter;
 import lombok.Setter;
-import org.joml.Vector3f;
 import org.lwjgl.system.MemoryUtil;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.AbstractMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
@@ -53,6 +53,14 @@ public class Mesh extends Component {
         super(ComponentType.MESH);
     }
 
+    public Mesh(float[] positions) {
+        super(ComponentType.MESH);
+
+        this.positions = positions;
+
+        render(positions);
+    }
+
     public Mesh(float[] positions, float[] textureCoordinates, float[] normals, int[] indices) {
         super(ComponentType.MESH);
 
@@ -78,18 +86,53 @@ public class Mesh extends Component {
 
     @Override
     public void update() {
-        Texture texture = material.getTexture();
-        if (texture != null) {
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, texture.getId());
+        if(textureVboId == 0) {
+            glBindVertexArray(getVaoId());
+            glEnableVertexAttribArray(0);
+
+            glDrawArrays(GL_TRIANGLE_STRIP, 0, getVertexCount());
+
+            glDisableVertexAttribArray(0);
+            glBindVertexArray(0);
+        } else {
+            Texture texture = material.getTexture();
+            if (texture != null) {
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, texture.getId());
+            }
+            glBindVertexArray(getVaoId());
+
+            glEnableVertexAttribArray(0);
+            glEnableVertexAttribArray(1);
+            glEnableVertexAttribArray(2);
+
+            glDrawElements(GL_TRIANGLES, getVertexCount(), GL_UNSIGNED_INT, 0);
+            glBindVertexArray(0);
+            glBindTexture(GL_TEXTURE_2D, 0);
         }
-        glBindVertexArray(getVaoId());
-        glEnableVertexAttribArray(0);
-        glEnableVertexAttribArray(1);
-        glEnableVertexAttribArray(2);
-        glDrawElements(GL_TRIANGLES, getVertexCount(), GL_UNSIGNED_INT, 0);
-        glBindVertexArray(0);
-        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+
+    private void render(float[] positions){
+        FloatBuffer positionsBuffer = null;
+
+        try {
+            vertexCount = positions.length / 2;
+            vboIdList = new LinkedList<>();
+            vaoId = glGenVertexArrays();
+
+            glBindVertexArray(vaoId);
+
+            Entry<Integer, FloatBuffer> pair = createResourceBuffers(positions, 0, 2, GL_DYNAMIC_DRAW);
+            positionVboId = pair.getKey();
+            positionsBuffer = pair.getValue();
+
+            glBindVertexArray(0);
+        } finally {
+            if (positionsBuffer != null) {
+                this.positionBuffer = positionsBuffer;
+                MemoryUtil.memFree(positionsBuffer);
+            }
+        }
     }
 
     private void render(float[] positions, float[] textureCoordinates, float[] normals, int[] indices){
@@ -106,7 +149,7 @@ public class Mesh extends Component {
             glBindVertexArray(vaoId);
 
             if(positions != null) {
-                Pair<Integer, FloatBuffer> pair = createResourceBuffers(positions, 0, 3, GL_DYNAMIC_DRAW);
+                Entry<Integer, FloatBuffer> pair = createResourceBuffers(positions, 0, 3, GL_DYNAMIC_DRAW);
                 positionVboId = pair.getKey();
                 positionsBuffer = pair.getValue();
             } else {
@@ -114,13 +157,13 @@ public class Mesh extends Component {
             }
 
             if(textureCoordinates != null) {
-                Pair<Integer, FloatBuffer> pair = createResourceBuffers(textureCoordinates, 1, 2, GL_STATIC_DRAW);
+                Entry<Integer, FloatBuffer> pair = createResourceBuffers(textureCoordinates, 1, 2, GL_STATIC_DRAW);
                 textureVboId = pair.getKey();
                 textureCoordinatesBuffer = pair.getValue();
             }
 
             if(normals != null) {
-                Pair<Integer, FloatBuffer> pair = createResourceBuffers(normals, 2, 3, GL_STATIC_DRAW);
+                Entry<Integer, FloatBuffer> pair = createResourceBuffers(normals, 2, 3, GL_STATIC_DRAW);
                 normalsVboId = pair.getKey();
                 normalsBuffer = pair.getValue();
             } else {
@@ -142,21 +185,24 @@ public class Mesh extends Component {
                 MemoryUtil.memFree(positionsBuffer);
             }
             if (textureCoordinatesBuffer != null) {
+                this.textureCoordinates = textureCoordinates;
                 MemoryUtil.memFree(textureCoordinatesBuffer);
             }
             if (normalsBuffer != null) {
+                this.normalsBuffer = normalsBuffer;
                 MemoryUtil.memFree(normalsBuffer);
             }
             if (indicesBuffer != null) {
+                this.indicesBuffer = indicesBuffer;
                 MemoryUtil.memFree(indicesBuffer);
             }
         }
     }
 
-    public void updatePositions(float[] positions) {
+    public void updatePositions(float[] positions, int size) {
         try {
             glBindBuffer(GL_ARRAY_BUFFER, positionVboId);
-            glBufferSubData(GL_ARRAY_BUFFER, 0, UtilModel.updateFlippedBuffer(positionBuffer, positions));
+            glBufferSubData(GL_ARRAY_BUFFER, 0, UtilModel.updateFlippedBuffer(positionBuffer, positions, size));
             glBindBuffer(GL_ARRAY_BUFFER, 0);
         } finally {
             this.positions = positions;
@@ -185,7 +231,7 @@ public class Mesh extends Component {
         }
     }
 
-    public Pair<Integer, FloatBuffer> createResourceBuffers(float[] bufferData, int index, int size, int drawType) {
+    public Entry<Integer, FloatBuffer> createResourceBuffers(float[] bufferData, int index, int size, int drawType) {
         int vboId = glGenBuffers();
 
         vboIdList.add(vboId);
@@ -198,7 +244,7 @@ public class Mesh extends Component {
         glEnableVertexAttribArray(index);
         glVertexAttribPointer(index, size, GL_FLOAT, false, 0, 0);
 
-        return new Pair<>(vboId, buffer);
+        return new AbstractMap.SimpleEntry<Integer, FloatBuffer>(vboId, buffer);
     }
 
     public boolean isTextured() {

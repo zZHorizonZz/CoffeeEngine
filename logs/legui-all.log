@@ -1,0 +1,5 @@
+11:48:09 ERROR	[main   ]	or.li.le.im.StbBackedLoadableImage      :	45	:	org.liquidengine.legui.exception.LeguiException: Failed to initialize image. (org/liquidengine/legui/demo/1.jpg)
+11:48:09 ERROR	[main   ]	or.li.le.im.StbBackedLoadableImage      :	45	:	org.liquidengine.legui.exception.LeguiException: Failed to initialize image. (org/liquidengine/legui/demo/1.png)
+11:48:09 ERROR	[main   ]	or.li.le.im.StbBackedLoadableImage      :	45	:	org.liquidengine.legui.exception.LeguiException: Failed to initialize image. (org/liquidengine/legui/demo/2.png)
+11:48:09 ERROR	[main   ]	or.li.le.im.StbBackedLoadableImage      :	45	:	org.liquidengine.legui.exception.LeguiException: Failed to initialize image. (org/liquidengine/legui/demo/3.png)
+11:48:09 ERROR	[main   ]	or.li.le.im.StbBackedLoadableImage      :	45	:	org.liquidengine.legui.exception.LeguiException: Failed to initialize image. (org/liquidengine/legui/demo/toggle.png)

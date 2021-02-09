@@ -21,7 +21,7 @@ public class Renderer {
     @Getter private GraphicShader graphicShader;
     @Getter private HudShader hudShader;
 
-    @Getter private float specularPower;
+    @Getter private final float specularPower;
 
     public Renderer() {
         transformation = new Transformation();
@@ -45,7 +45,7 @@ public class Renderer {
     }
 
     public void clear() {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     }
 
     public void render(Window window, Camera camera, Scene scene, Canvas canvas, Vector3f ambientLight) {

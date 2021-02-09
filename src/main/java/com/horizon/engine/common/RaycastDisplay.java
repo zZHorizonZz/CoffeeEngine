@@ -27,8 +27,8 @@ public class RaycastDisplay extends Raycast {
     }
 
     public GameObject selectGameObject(Collection<GameObject> gameObjects, Window window, Vector2d mousePos, Camera camera) {
-        int wdwWitdh = window.getWidth();
-        int wdwHeight = window.getHeight();
+        int wdwWitdh = Window.getWidth();
+        int wdwHeight = Window.getHeight();
 
         float x = (float)(2 * mousePos.x) / (float)wdwWitdh - 1.0f;
         float y = 1.0f - (float)(2 * mousePos.y) / (float)wdwHeight;

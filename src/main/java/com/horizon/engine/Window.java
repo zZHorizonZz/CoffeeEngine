@@ -1,19 +1,16 @@
 package com.horizon.engine;
 
 import com.horizon.engine.common.Color;
-import com.horizon.engine.event.event.ScreenResizeEvent;
 import lombok.Getter;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
-import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWFramebufferSizeCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryUtil;
 
-import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -37,7 +34,7 @@ public class Window {
     private boolean resized;
     private boolean vSync;
 
-    private Matrix4f projectionMatrix;
+    private final Matrix4f projectionMatrix;
 
     protected GLFWFramebufferSizeCallback framebufferSizeCallback;
 
@@ -92,6 +89,7 @@ public class Window {
 
         glfwShowWindow(windowHandle);
         enableCapabilities();
+        //enableLEGUI();
     }
 
     private void enableCapabilities(){
@@ -99,9 +97,11 @@ public class Window {
 
         glClearColor(0.2f, 0.5f, 0.65f, 1.0f);
         glEnable(GL_DEPTH_TEST);
+        glEnable(GL_STENCIL_TEST);
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        //glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);

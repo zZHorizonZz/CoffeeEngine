@@ -61,15 +61,15 @@ public class UtilModel {
         return positions;
     }
 
-    public static FloatBuffer updateFlippedBuffer(FloatBuffer buffer, float[] vectors)
+    public static FloatBuffer updateFlippedBuffer(FloatBuffer buffer, float[] vectors, int size)
     {
         buffer.clear();
 
-        for(int i = 0; i < vectors.length; i+= 3)
+        for(int i = 0; i < vectors.length; i+= size)
         {
-            buffer.put(vectors[i]);
-            buffer.put(vectors[i + 1]);
-            buffer.put(vectors[i + 2]);
+            for(int x = 0; x < size; x++) {
+                buffer.put(vectors[i + x]);
+            }
         }
 
         buffer.flip();

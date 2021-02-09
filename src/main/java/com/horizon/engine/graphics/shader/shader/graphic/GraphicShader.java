@@ -121,7 +121,7 @@ public class GraphicShader extends ShaderProgram {
     @Override
     public void render(Window window, Camera camera, Scene scene, Canvas canvas, Vector3f ambientLight) {
         start();
-        transformation.updateProjectionMatrix(FOV, window.getWidth(), window.getHeight(), Z_NEAR, Z_FAR);
+        transformation.updateProjectionMatrix(FOV, Window.getWidth(), Window.getHeight(), Z_NEAR, Z_FAR);
 
         Matrix4f projectionMatrix = transformation.getProjectionMatrix();
         setUniformMatrix4("projectionMatrix", projectionMatrix);

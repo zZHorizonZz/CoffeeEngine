@@ -1,5 +1,7 @@
 package com.horizon.engine.common.file;
 
+import com.horizon.engine.GameEngine;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -9,7 +11,7 @@ public class File {
     private static final String FILE_SEPARATOR = "/";
 
     private String path;
-    private String name;
+    private final String name;
 
     public File(String path) {
         this.path = FILE_SEPARATOR + path;
@@ -50,17 +52,17 @@ public class File {
     }
 
     public InputStream getInputStream() {
-        return Class.class.getResourceAsStream(path);
+        return File.class.getResourceAsStream(path);
     }
 
-    public BufferedReader getReader() throws Exception {
+    public BufferedReader getReader() {
         try {
             InputStreamReader isr = new InputStreamReader(getInputStream());
             BufferedReader reader = new BufferedReader(isr);
             return reader;
-        } catch (Exception e) {
+        } catch (Exception exception) {
             System.err.println("Couldn't get reader for " + path);
-            throw e;
+            throw exception;
         }
     }
 

@@ -1,16 +1,17 @@
 package com.horizon.engine.graphics.object.hud.orientations;
 
-import com.horizon.engine.GameEngine;
 import com.horizon.engine.Window;
+import com.horizon.engine.graphics.object.hud.HudObject;
 import lombok.Getter;
 import lombok.Setter;
 
-public class DisplayPercentage extends DisplayData {
+public class AlignmentPercentage extends AlignmentData {
 
     @Getter @Setter private float xPercentage;
     @Getter @Setter private float yPercentage;
 
-    public DisplayPercentage(float xPercentage, float yPercentage){
+    public AlignmentPercentage(HudObject hudObject, float xPercentage, float yPercentage){
+        super(hudObject);
         this.xPercentage = xPercentage;
         this.yPercentage = yPercentage;
     }

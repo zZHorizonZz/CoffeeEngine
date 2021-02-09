@@ -1,4 +1,4 @@
-package com.horizon.game;
+package com.horizon.engine.graphics.render;
 
 import com.horizon.engine.Window;
 import com.horizon.engine.event.event.ScreenResizeEvent;

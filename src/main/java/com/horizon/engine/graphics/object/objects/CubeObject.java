@@ -8,6 +8,6 @@ import com.horizon.engine.graphics.object.GameObject;
 public class CubeObject extends GameObject {
 
     public CubeObject(GameEngine engine, String name, Texture texture, Float scaleX, Float scaleY, Float scaleZ) {
-        super(engine, name, UtilModelLoader.loadMesh("/models/cube.obj"));
+        super(engine, name, engine.getAssetManager().getMesh("Cube"));
     }
 }

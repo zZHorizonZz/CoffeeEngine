@@ -44,7 +44,7 @@ void main()
         //fragColor.a *= alphaValue;
     }
 
-    //if(pixelPosition.y > 0.01){
+    //if(outTexCoord.y < 0.1f){
     //    fragColor = vec4(1.0f,1.0f,1.0f,1.0f);
     //}
 }

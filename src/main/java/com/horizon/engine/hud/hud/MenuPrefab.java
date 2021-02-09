@@ -1,13 +1,11 @@
 package com.horizon.engine.hud.hud;
 
-import com.horizon.engine.GameEngine;
 import com.horizon.engine.component.component.hud.text.TextFont;
 import com.horizon.engine.data.ApplicationSetting;
 import com.horizon.engine.graphics.hud.Canvas;
 import com.horizon.engine.graphics.object.hud.objects.BoxView;
 import com.horizon.engine.graphics.object.hud.orientations.AlignmentData;
 import com.horizon.engine.graphics.object.hud.orientations.AlignmentDistance;
-import com.horizon.engine.graphics.object.hud.orientations.AlignmentPercentage;
 import com.horizon.engine.graphics.object.hud.orientations.AlignmentSize;
 import com.horizon.engine.graphics.object.hud.other.DisplayAnchor;
 import com.horizon.engine.graphics.object.hud.text.TextView;
@@ -47,7 +45,7 @@ public class MenuPrefab {
 
         menuHeader = getCanvas().createTextView(name + " Header", name, TextFont.MODERN_SANS, DisplayAnchor.LEFT);
         menuHeader.setSize(25);
-        //menuHeader.setBold(true);
+        menuHeader.setBold(true);
         menuHeader.addAlignmentData(new AlignmentDistance(menuHeader, menuHeader.getWidth() / 2 + 25, 0));
         menuHeader.setParent(topMenuContainer);
     }

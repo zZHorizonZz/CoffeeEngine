@@ -43,7 +43,7 @@ public @Data class Scene {
         getGameEngine().getWindow().setClearColor(sceneCamera.getBackgroundColor());
     }
 
-    public void initializeObject(GameObject gameObject) {
+    public GameObject initializeObject(GameObject gameObject) {
         if(gameObject.getComponents().containsKey(ComponentType.LIGHT)) {
             Component component = gameObject.getComponents().get(ComponentType.LIGHT);
             if(component instanceof DirectionalLightComponent) {
@@ -59,6 +59,8 @@ public @Data class Scene {
             }
         }
         sceneObjects.put(gameObject.getGameObjectName(), gameObject);
+
+        return gameObject;
     }
 
     public GameObject getGameObjectByName(String name){

@@ -11,18 +11,13 @@ import java.util.List;
 
 public class Grid extends GameObject {
 
-    @Getter
-    private final List<GridSquare> squares = new LinkedList<>();
+    @Getter private final List<GridSquare> squares = new LinkedList<>();
 
-    @Getter
-    private float[] coordinates, textureCoordinates;
-    @Getter
-    private int[] indices;
+    @Getter private float[] coordinates, textureCoordinates;
+    @Getter private int[] indices;
 
-    @Getter
-    private final float size;
-    @Getter
-    private final int gridSize;
+    @Getter private final float size;
+    @Getter private final int gridSize;
 
     private final int[] gridCalculationSchema = new int[]{0, 1, 2, 2, 0, 3};
 

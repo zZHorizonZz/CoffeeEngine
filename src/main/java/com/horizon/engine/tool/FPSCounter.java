@@ -17,7 +17,7 @@ public class FPSCounter {
     public FPSCounter(GameEngine gameEngine){
         this.gameEngine = gameEngine;
 
-        fpsCounterText = ((DummyGame) getGameEngine().getGameLogic()).getCanvas().createTextView("FPS Counter", " FPS", TextFont.IMPACT, DisplayAnchor.TOP);
+        fpsCounterText = getGameEngine().getGameLogic().getCanvas().createTextView("FPS Counter", " FPS", TextFont.IMPACT, DisplayAnchor.TOP);
         fpsCounterText.setSize(16);
         fpsCounterText.addAlignmentData(new AlignmentPercentage(fpsCounterText, -95, 0));
         fpsCounterText.addAlignmentData(new AlignmentDistance(fpsCounterText, 0, 25));

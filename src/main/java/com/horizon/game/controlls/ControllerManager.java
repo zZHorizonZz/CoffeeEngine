@@ -1,5 +1,6 @@
 package com.horizon.game.controlls;
 
+import com.horizon.engine.AbstractGameLogic;
 import com.horizon.engine.AbstractManager;
 import com.horizon.engine.GameEngine;
 import com.horizon.engine.Window;
@@ -7,6 +8,8 @@ import com.horizon.engine.common.RaycastDisplay;
 import com.horizon.engine.graphics.object.Camera;
 import com.horizon.engine.graphics.object.GameObject;
 import com.horizon.engine.graphics.object.hud.text.TextView;
+import com.horizon.engine.input.other.InputHandler;
+import com.horizon.engine.input.other.InputType;
 import com.horizon.engine.input.other.MouseInput;
 import com.horizon.game.DummyGame;
 import lombok.Getter;
@@ -14,9 +17,11 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
+import static org.lwjgl.glfw.GLFW.glfwSetWindowShouldClose;
+
 public class ControllerManager extends AbstractManager {
 
-    @Getter private final DummyGame game;
+    @Getter private final AbstractGameLogic game;
 
     @Getter private Camera camera;
     @Getter private RaycastDisplay raycast;
@@ -28,18 +33,18 @@ public class ControllerManager extends AbstractManager {
     public ControllerManager(GameEngine gameEngine){
         super(gameEngine, "Controller Manager");
 
-        game = (DummyGame) gameEngine.getGameLogic();
+        game = gameEngine.getGameLogic();
         cameraMovement = new Vector3f(0, 0, 0);
     }
 
     @Override
     public void onEnable() {
-
+        registerSelf();
     }
 
     @Override
     public void initialize() {
-        camera = game.getGameScene().getSceneCamera();
+        camera = game.getScene().getSceneCamera();
     }
 
     public void onCameraMovement(Window window){
@@ -77,9 +82,13 @@ public class ControllerManager extends AbstractManager {
         camera.updateViewMatrix();
 
         if (mouseInput.isLeftButtonPressed()) {
-            GameObject gameObject = raycast.selectGameObject(getGame().getGameScene().getSceneObjects().values(), getGame().getGameEngine().getWindow(), mouseInput.getCurrentPosition(), getCamera());
-
-            ((TextView) getGame().getCanvas().getCanvasObjects().get("test")).getTextComponent().setText("Object Selected -> " + gameObject.getPosition().x() + " Y: " + gameObject.getPosition().y() + " Z: " + gameObject.getPosition().z());
+            GameObject gameObject = raycast.selectGameObject(getGame().getScene().getSceneObjects().values(), getGame().getGameEngine().getWindow(), mouseInput.getCurrentPosition(), getCamera());
         }
+    }
+
+    @InputHandler(name = "Close Game", input = GLFW.GLFW_KEY_ESCAPE, inputType = InputType.KEY_UP)
+    public void onGameClose(){
+        logAtInfo("Closing the game window...");
+        glfwSetWindowShouldClose(getGameEngine().getWindow().getWindowHandle(), true);
     }
 }

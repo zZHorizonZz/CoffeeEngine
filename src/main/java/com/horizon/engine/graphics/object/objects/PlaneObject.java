@@ -7,6 +7,6 @@ import com.horizon.engine.graphics.object.GameObject;
 public class PlaneObject extends GameObject {
 
     public PlaneObject(GameEngine engine, String name) {
-        super(engine, name, UtilModelLoader.loadMesh("/models/plane.obj"));
+        super(engine, name, engine.getAssetManager().getMesh("Plane"));
     }
 }

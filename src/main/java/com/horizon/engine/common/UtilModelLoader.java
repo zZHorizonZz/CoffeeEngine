@@ -1,6 +1,7 @@
 package com.horizon.engine.common;
 
 import com.horizon.engine.component.component.Mesh;
+import com.horizon.engine.graphics.data.MeshData;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
@@ -9,7 +10,7 @@ import java.util.List;
 
 public class UtilModelLoader {
 
-    public static Mesh loadMesh(String fileName){
+    public static MeshData loadMesh(String fileName){
         try{
             List<String> lines = UtilResource.readAllLines(fileName);
 
@@ -18,9 +19,14 @@ public class UtilModelLoader {
             List<Vector3f> normals = new ArrayList<>();
             List<Face> faces = new ArrayList<>();
 
+            String name = "No Name";
+
             for (String line : lines) {
                 String[] tokens = line.split("\\s+");
                 switch (tokens[0]) {
+                    case "o":
+                        name = tokens[1];
+                        break;
                     case "v":
                         // Geometric vertex
                         Vector3f vec3f = new Vector3f(
@@ -53,14 +59,17 @@ public class UtilModelLoader {
                         break;
                 }
             }
-            return reorderLists(vertices, textures, normals, faces);
+            MeshData meshData = reorderLists(vertices, textures, normals, faces);
+            meshData.setName(name);
+
+            return meshData;
         }catch (Exception exception){
             exception.printStackTrace();
             return null;
         }
     }
 
-    private static Mesh reorderLists(List<Vector3f> posList, List<Vector2f> textCoordList,
+    private static MeshData reorderLists(List<Vector3f> posList, List<Vector2f> textCoordList,
                                      List<Vector3f> normList, List<Face> facesList) {
 
         List<Integer> indices = new ArrayList<>();
@@ -85,7 +94,7 @@ public class UtilModelLoader {
         }
         int[] indicesArr = new int[indices.size()];
         indicesArr = indices.stream().mapToInt((Integer v) -> v).toArray();
-        Mesh mesh = new Mesh(posArr, textCoordArr, normArr, indicesArr);
+        MeshData mesh = new MeshData(posArr, textCoordArr, normArr, indicesArr);
         return mesh;
     }
 

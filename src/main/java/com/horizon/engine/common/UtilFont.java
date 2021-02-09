@@ -16,9 +16,10 @@ public class UtilFont {
         try{
             InputStream is = UtilFont.class.getResourceAsStream(file);
             font = java.awt.Font.createFont(Font.TRUETYPE_FONT, is);
+            font = font.deriveFont(Font.PLAIN, 20);
+
             GameEngine.getLogger().atInfo().log("Font -> Font successfully loaded " + font.getFontName());
             return font;
-            //font = font.deriveFont(Font.BOLD, 20);
         }
         catch (IOException | FontFormatException exception){
             exception.printStackTrace();

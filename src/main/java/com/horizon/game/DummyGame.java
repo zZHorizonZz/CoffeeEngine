@@ -1,20 +1,17 @@
 package com.horizon.game;
 
-import com.horizon.engine.GameEngine;
-import com.horizon.engine.IGameLogic;
+import com.horizon.engine.AbstractGameLogic;
 import com.horizon.engine.Window;
 import com.horizon.engine.component.ComponentType;
 import com.horizon.engine.component.component.light.Light;
-import com.horizon.engine.graphics.data.Material;
-import com.horizon.engine.graphics.data.Texture;
 import com.horizon.engine.graphics.hud.Canvas;
 import com.horizon.engine.graphics.light.PointLight;
 import com.horizon.engine.graphics.light.SpotLight;
 import com.horizon.engine.graphics.object.Camera;
 import com.horizon.engine.graphics.object.GameObject;
 import com.horizon.engine.graphics.object.objects.CubeObject;
-import com.horizon.engine.graphics.object.objects.CylinderObject;
 import com.horizon.engine.graphics.object.scene.Scene;
+import com.horizon.engine.graphics.render.Renderer;
 import com.horizon.engine.input.other.MouseInput;
 import com.horizon.engine.tool.FPSCounter;
 import com.horizon.game.building.house.TestObject;
@@ -22,13 +19,8 @@ import com.horizon.game.controlls.ControllerManager;
 import com.horizon.game.testing.TestManager;
 import lombok.Getter;
 import org.joml.Vector3f;
-import org.lwjgl.glfw.GLFW;
 
-public class DummyGame implements IGameLogic {
-
-    @Getter private GameEngine gameEngine;
-    @Getter private Scene gameScene;
-    @Getter private Canvas canvas;
+public class DummyGame extends AbstractGameLogic {
 
     @Getter private FPSCounter fpsCounter;
 
@@ -38,8 +30,6 @@ public class DummyGame implements IGameLogic {
     @Getter private ControllerManager controllerManager;
 
     @Getter private CubeObject player;
-
-    private float x,y,z;
 
     private Vector3f ambientLight;
     private PointLight pointLight;
@@ -53,16 +43,16 @@ public class DummyGame implements IGameLogic {
     public void initialize() throws Exception {
         renderer.initialize(getGameEngine().getWindow());
 
-        gameScene = new Scene(getGameEngine());
-        gameScene.initialize();
+        setScene(new Scene(getGameEngine()));
+        getScene().initialize();
 
-        canvas = new Canvas(getGameEngine());
+        setCanvas(new Canvas(getGameEngine()));
 
         testManager = new TestManager(getGameEngine());
         controllerManager = new ControllerManager(getGameEngine());
         controllerManager.initialize();
 
-        new TestObject(getGameEngine(), getGameScene());
+        new TestObject(getGameEngine(), getScene());
 
         ambientLight = new Vector3f(0.3f, 0.3f, 0.3f);
 
@@ -79,8 +69,8 @@ public class DummyGame implements IGameLogic {
 
         lightPosition = new Vector3f(-1, 0, 0);
 
-        getGameScene().initializeObject(pointLight);
-        getGameScene().initializeObject(spotLight);
+        getScene().initializeObject(pointLight);
+        getScene().initializeObject(spotLight);
 
         fpsCounter = new FPSCounter(getGameEngine());
     }
@@ -88,20 +78,6 @@ public class DummyGame implements IGameLogic {
     @Override
     public void onInput(Window window, MouseInput mouseInput) {
         getControllerManager().onCameraMovement(window);
-
-        z = 0;
-        x = 0;
-
-        if (window.isKeyPressed(GLFW.GLFW_KEY_UP)) {
-            z = -1;
-        } else if (window.isKeyPressed(GLFW.GLFW_KEY_DOWN)) {
-            z = 1;
-        }
-        if (window.isKeyPressed(GLFW.GLFW_KEY_LEFT)) {
-            x = -1;
-        } else if (window.isKeyPressed(GLFW.GLFW_KEY_RIGHT)) {
-            x = 1;
-        }
     }
 
     @Override
@@ -119,22 +95,18 @@ public class DummyGame implements IGameLogic {
         if(camera == null)
             return;
 
-        renderer.render(window, camera, getGameScene(), getCanvas(), ambientLight);
+        renderer.render(window, camera, getScene(), getCanvas(), ambientLight);
     }
 
     @Override
     public void cleanup() {
         renderer.cleanup();
-        for (GameObject gameObject : getGameScene().getSceneObjects().values()) {
+        for (GameObject gameObject : getScene().getSceneObjects().values()) {
             if(!gameObject.getComponents().containsKey(ComponentType.MESH))
                 continue;
 
             gameObject.getMesh().cleanUp();
             gameObject.getMesh().cleanUpTexture();
         }
-    }
-
-    public void assignGameEngine(GameEngine gameEngine){
-        this.gameEngine = gameEngine;
     }
 }

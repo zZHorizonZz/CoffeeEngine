@@ -47,7 +47,13 @@ public class TextComponent extends Component {
             return;
 
         gameObject.getMesh().cleanUp();
-        gameObject.getComponents().replace(ComponentType.MESH, buildMesh(getFont().setSize(size)));
+
+        if(isBold())
+            getFont().getFont().setFont(getFont().getFont().getFont().deriveFont(java.awt.Font.BOLD, getSize()));
+        else
+            getFont().getFont().setFont(getFont().getFont().getFont().deriveFont(java.awt.Font.PLAIN, getSize()));
+
+        gameObject.getComponents().replace(ComponentType.MESH, buildMesh(getFont().getFont()));
     }
 
     public void setBold(boolean bold) {

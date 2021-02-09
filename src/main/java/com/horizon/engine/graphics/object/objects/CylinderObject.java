@@ -11,7 +11,7 @@ public class CylinderObject extends GameObject {
     @Getter private final Float scaleX, scaleY, scaleZ;
 
     public CylinderObject(GameEngine engine, String name, Texture texture, Float scaleX, Float scaleY, Float scaleZ) {
-        super(engine, name, UtilModelLoader.loadMesh("/models/cylinder.obj"));
+        super(engine, name, engine.getAssetManager().getMesh("Cylinder"));
 
         this.scaleX = scaleX;
         this.scaleY = scaleY;

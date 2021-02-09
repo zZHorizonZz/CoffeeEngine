@@ -1,6 +1,7 @@
 package com.horizon.engine;
 
 import com.google.common.flogger.FluentLogger;
+import com.horizon.engine.asset.AssetManager;
 import com.horizon.engine.event.EventManager;
 import com.horizon.engine.input.InputManager;
 import com.horizon.engine.input.other.MouseInput;
@@ -18,7 +19,7 @@ public class GameEngine implements Runnable {
 
     @Getter private final Window window;
     @Getter private final Timer timer;
-    @Getter private final IGameLogic gameLogic;
+    @Getter private final AbstractGameLogic gameLogic;
 
     //Managers
     @Getter private final MouseInput mouseInput;
@@ -27,12 +28,13 @@ public class GameEngine implements Runnable {
     @Getter private ModelManager modelManager;
     @Getter private ToolManager toolManager;
     @Getter private EventManager eventManager;
+    @Getter private AssetManager assetManager;
 
     @Getter private long lastTime = System.currentTimeMillis();
     @Getter private long currentFramesPerSecond = 0;
     @Getter private long lastFramesPerSecond = 0;
 
-    public GameEngine(String windowTitle, int width, int height, boolean vSync, IGameLogic gameLogic) throws Exception {
+    public GameEngine(String windowTitle, int width, int height, boolean vSync, AbstractGameLogic gameLogic) throws Exception {
         window = new Window(this, windowTitle, width, height, vSync);
         mouseInput = new MouseInput();
         this.gameLogic = gameLogic;
@@ -58,14 +60,34 @@ public class GameEngine implements Runnable {
         mouseInput.init(window);
 
         //Managers
+        assetManager = new AssetManager(this);
         inputManager = new InputManager(this);
         modelManager = new ModelManager(this);
         toolManager = new ToolManager(this);
         eventManager = new EventManager(this);
 
+        loadAssets();
+
         //Final initialization
-        ((DummyGame) gameLogic).assignGameEngine(this); //Todo create abstract class for game itself.
+        gameLogic.setGameEngine(this);
         gameLogic.initialize();
+    }
+
+    protected void loadAssets() {
+        loadBasicModels();
+        loadFonts();
+    }
+
+    protected void loadBasicModels() {
+        getAssetManager().loadMesh("/models", "plane.obj");
+        getAssetManager().loadMesh("/models", "cone.obj");
+        getAssetManager().loadMesh("/models", "cube.obj");
+        getAssetManager().loadMesh("/models", "cylinder.obj");
+    }
+
+    protected void loadFonts() {
+        AssetManager.loadFont("Baba.otf");
+        AssetManager.loadFont("ModernSans-Light.otf");
     }
 
     protected void gameLoop() {

@@ -13,6 +13,7 @@ import com.horizon.engine.graphics.hud.Canvas;
 import com.horizon.engine.graphics.light.DirectionalLight;
 import com.horizon.engine.graphics.light.PointLight;
 import com.horizon.engine.graphics.light.SpotLight;
+import com.horizon.engine.graphics.object.BatchGameObject;
 import com.horizon.engine.graphics.object.Camera;
 import com.horizon.engine.graphics.object.GameObject;
 import com.horizon.engine.graphics.object.scene.Scene;
@@ -24,6 +25,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
+import java.util.Collection;
 import java.util.List;
 
 public class GraphicShader extends ShaderProgram {
@@ -55,6 +57,10 @@ public class GraphicShader extends ShaderProgram {
         this.specularPower = 10.0f;
         this.transformation = transformation;
     }
+
+    /**
+     * Uniform settings.
+     */
 
     public void setUniform(String uniformName, PointLightComponent pointLightComponent) {
         setUniformVector3f(uniformName + ".colour", pointLightComponent.getColor());
@@ -121,44 +127,70 @@ public class GraphicShader extends ShaderProgram {
     @Override
     public void render(Window window, Camera camera, Scene scene, Canvas canvas, Vector3f ambientLight) {
         start();
+
         transformation.updateProjectionMatrix(FOV, Window.getWidth(), Window.getHeight(), Z_NEAR, Z_FAR);
 
         Matrix4f projectionMatrix = transformation.getProjectionMatrix();
-        setUniformMatrix4("projectionMatrix", projectionMatrix);
-
         Matrix4f viewMatrix = camera.getViewMatrix();
 
-        // Update Light Uniforms
+        setUniformMatrix4("projectionMatrix", projectionMatrix);
+
         renderLights(viewMatrix, ambientLight, scene.getPointLightList(), scene.getSpotLightList(), scene.getDirectionalLight());
 
         setUniformInt("texture_sampler", 0);
-        for (GameObject gameObject : scene.getSceneObjects().values()) {
-            Matrix4f modelMatrix = transformation.buildModelMatrix(gameObject);
-
-            if(!gameObject.getComponents().containsKey(ComponentType.MESH))
-                continue;
-
-            Mesh mesh = gameObject.getMesh();
-            Matrix4f modelViewMatrix = transformation.buildModelViewMatrix(modelMatrix, viewMatrix);
-            setUniformMatrix4("modelViewMatrix", modelViewMatrix);
-            setUniform("material", mesh.getMaterial());
-            mesh.update();
-        }
+        renderGameObjects(scene.getSceneObjects().values(), viewMatrix);
 
         stop();
     }
 
+    public void renderGameObjects(List<GameObject> gameObjects, Matrix4f viewMatrix) {
+        for (GameObject gameObject : gameObjects) {
+            if(!gameObject.getComponents().containsKey(ComponentType.MESH))
+                continue;
+
+            Matrix4f modelMatrix = transformation.buildModelMatrix(gameObject);
+
+            Mesh mesh = gameObject.getMesh();
+            Matrix4f modelViewMatrix = transformation.buildModelViewMatrix(modelMatrix, viewMatrix);
+
+            setUniformMatrix4("modelViewMatrix", modelViewMatrix);
+            setUniform("material", mesh.getMaterial());
+            mesh.update();
+        }
+    }
+
+    public void renderGameObjects(Collection<GameObject> gameObjects, Matrix4f viewMatrix) {
+        for (GameObject gameObject : gameObjects) {
+            if(gameObject instanceof BatchGameObject) {
+                renderGameObjects(((BatchGameObject) gameObject).getBatchObjects(), viewMatrix);
+                continue;
+            }
+
+            if(!gameObject.getComponents().containsKey(ComponentType.MESH))
+                continue;
+
+            Matrix4f modelMatrix = transformation.buildModelMatrix(gameObject);
+
+            Mesh mesh = gameObject.getMesh();
+            Matrix4f modelViewMatrix = transformation.buildModelViewMatrix(modelMatrix, viewMatrix);
+
+            setUniformMatrix4("modelViewMatrix", modelViewMatrix);
+            setUniform("material", mesh.getMaterial());
+            mesh.update();
+        }
+    }
+
     @Override
     public void initialize(){
-        for(int i = 0; i < MAX_POINT_LIGHTS; i++){
-            createPointLightUniform("pointLights" + "[" + i + "]");
-        }
-
-        for(int i = 0; i < MAX_SPOT_LIGHTS; i++){
-            createSpotLightUniform("spotLights" + "[" + i + "]");
-        }
-
         try {
+            for(int i = 0; i < MAX_POINT_LIGHTS; i++){
+                createPointLightUniform("pointLights" + "[" + i + "]");
+            }
+
+            for(int i = 0; i < MAX_SPOT_LIGHTS; i++){
+                createSpotLightUniform("spotLights" + "[" + i + "]");
+            }
+
             createDirectionalLightUniform("directionalLight");
         } catch (Exception exception) {
             exception.printStackTrace();
@@ -205,10 +237,10 @@ public class GraphicShader extends ShaderProgram {
 
         // Get a copy of the directional light object and transform its position to view coordinates
         DirectionalLightComponent currDirLight = new DirectionalLightComponent(directionalLight.getDirectionalLight());
-        Vector4f dir = new Vector4f(currDirLight.getDirection(), 0);
-        dir.mul(viewMatrix);
-        currDirLight.setDirection(new Vector3f(dir.x, dir.y, dir.z));
-        setUniform("directionalLight", currDirLight);
+        Vector4f direction = new Vector4f(currDirLight.getDirection(), 0);
+        direction.mul(viewMatrix);
+        currDirLight.setDirection(new Vector3f(direction.x, direction.y, direction.z));
 
+        setUniform("directionalLight", currDirLight);
     }
 }

@@ -23,6 +23,6 @@ public @Data class MeshData {
     }
 
     public Mesh createMesh() {
-        return new Mesh(positions, textCoordinates, normals, indices);
+        return new Mesh(positions.clone(), textCoordinates.clone(), normals.clone(), indices.clone());
     }
 }

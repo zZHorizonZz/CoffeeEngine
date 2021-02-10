@@ -9,4 +9,9 @@ public class PlaneObject extends GameObject {
     public PlaneObject(GameEngine engine, String name) {
         super(engine, name, engine.getAssetManager().getMesh("Plane"));
     }
+
+    @Override
+    public void update() {
+
+    }
 }

@@ -15,7 +15,6 @@ public class MouseInput {
     private boolean inWindow = false;
 
     private boolean leftButtonPressed = false;
-
     private boolean rightButtonPressed = false;
 
     public MouseInput() {

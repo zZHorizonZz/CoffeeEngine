@@ -2,7 +2,7 @@ package com.horizon.kingdom_builder;
 
 import com.horizon.engine.AbstractGameLogic;
 import com.horizon.engine.GameEngine;
-import com.horizon.engine.data.ApplicationSetting;
+import com.horizon.engine.data.ApplicationData;
 
 public class GameLoader {
 
@@ -10,10 +10,10 @@ public class GameLoader {
         try {
             AbstractGameLogic gameLogic = new KingdomBuilder();
 
-            GameEngine gameEngine = new GameEngine(ApplicationSetting.getWindowTitle(),
-                    (int) ApplicationSetting.getWindowSize().x(),
-                    (int) ApplicationSetting.getWindowSize().y(),
-                    ApplicationSetting.isVSync(),
+            GameEngine gameEngine = new GameEngine(ApplicationData.getWindowTitle(),
+                    (int) ApplicationData.getWindowSize().x(),
+                    (int) ApplicationData.getWindowSize().y(),
+                    ApplicationData.isVSync(),
                     gameLogic);
 
             gameEngine.run();

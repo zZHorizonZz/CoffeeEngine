@@ -3,6 +3,7 @@ package com.horizon.engine.common;
 import com.horizon.engine.Window;
 import com.horizon.engine.graphics.object.Camera;
 import com.horizon.engine.graphics.object.GameObject;
+import com.horizon.engine.graphics.object.scene.Scene;
 import lombok.Getter;
 import org.joml.Matrix4f;
 import org.joml.Vector2d;

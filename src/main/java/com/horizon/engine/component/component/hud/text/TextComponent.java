@@ -24,9 +24,10 @@ public class TextComponent extends Component {
     @Getter private float textHeight;
 
     @Getter private boolean bold = false;
+    @Getter private float spaceBetweenLines = 0.5f;
 
-    private static final float ZPOS = 0.0f;
-    private static final int VERTICES_PER_QUAD = 4;
+    private final float ZPOS = 0.0f;
+    private final int VERTICES_PER_QUAD = 4;
 
     protected GameObject gameObject;
 
@@ -66,6 +67,16 @@ public class TextComponent extends Component {
         gameObject.getComponents().replace(ComponentType.MESH, buildMesh(getFont().getFont()));
     }
 
+    public void setSpaceBetweenLines(float spaceBetweenLines) {
+        this.spaceBetweenLines = spaceBetweenLines;
+
+        if(gameObject.getMesh() == null)
+            return;
+
+        gameObject.getMesh().cleanUp();
+        gameObject.getComponents().replace(ComponentType.MESH, buildMesh(getFont().getFont()));
+    }
+
     private Mesh buildMesh(Font font) {
         List<Float> positions = new ArrayList<>();
         List<Float> textureCoordinates = new ArrayList<>();
@@ -74,55 +85,78 @@ public class TextComponent extends Component {
         if(isBold())
             font.setFont(font.getFont().deriveFont(java.awt.Font.BOLD, getSize()));
 
-        float[] normals   = new float[0];
+        float[] normals = new float[0];
         char[] characters = text.toCharArray();
         int numChars = characters.length;
 
-        float startx = 0;
-        for(int i=0; i<numChars; i++) {
+        float startx = 0.0f;
+        float starty = 0.0f;
+
+        float textWidth = 0.0f;
+
+        int line = 1;
+        int superIndex = 0;
+
+        for(int i = 0; i < numChars; i++) {
+            if(i - 1 >= 0 && characters[i - 1] == '/' && characters[i] == 'n')
+                continue;
+
+            if(i != characters.length - 1 && characters[i] == '/' && characters[i + 1] == 'n') {
+                startx = 0.0f;
+                starty += font.getHeight() + spaceBetweenLines;
+
+                line++;
+                continue;
+            }
+
             Font.CharInfo charInfo = font.getCharInfo(characters[i]);
 
             // Left Top vertex
             positions.add(startx); // x
-            positions.add(0.0f); //y
+            positions.add(starty); //y
             positions.add(ZPOS); //z
-            textureCoordinates.add( (float)charInfo.getStartX() / (float)font.getWidth());
+            textureCoordinates.add( (float) charInfo.getStartX() / (float) font.getWidth());
             textureCoordinates.add(0.0f);
-            indices.add(i*VERTICES_PER_QUAD);
+            indices.add(superIndex * VERTICES_PER_QUAD);
 
             // Left Bottom vertex
             positions.add(startx); // x
-            positions.add((float)font.getHeight()); //y
+            positions.add(starty + (float) font.getHeight()); //y
             positions.add(ZPOS); //z
-            textureCoordinates.add((float)charInfo.getStartX() / (float)font.getWidth());
+            textureCoordinates.add((float) charInfo.getStartX() / (float) font.getWidth());
             textureCoordinates.add(1.0f);
-            indices.add(i*VERTICES_PER_QUAD + 1);
+            indices.add(superIndex * VERTICES_PER_QUAD + 1);
 
             // Right Bottom vertex
             positions.add(startx + charInfo.getWidth()); // x
-            positions.add((float)font.getHeight()); //y
+            positions.add(starty + (float) font.getHeight()); //y
             positions.add(ZPOS); //z
-            textureCoordinates.add((float)(charInfo.getStartX() + charInfo.getWidth() )/ (float)font.getWidth());
+            textureCoordinates.add((float) (charInfo.getStartX() + charInfo.getWidth()) / (float) font.getWidth());
             textureCoordinates.add(1.0f);
-            indices.add(i*VERTICES_PER_QUAD + 2);
+            indices.add(superIndex * VERTICES_PER_QUAD + 2);
 
             // Right Top vertex
             positions.add(startx + charInfo.getWidth()); // x
-            positions.add(0.0f); //y
+            positions.add(starty); //y
             positions.add(ZPOS); //z
-            textureCoordinates.add((float)(charInfo.getStartX() + charInfo.getWidth() )/ (float)font.getWidth());
+            textureCoordinates.add((float) (charInfo.getStartX() + charInfo.getWidth()) / (float) font.getWidth());
             textureCoordinates.add(0.0f);
-            indices.add(i*VERTICES_PER_QUAD + 3);
+            indices.add(superIndex * VERTICES_PER_QUAD + 3);
 
             // Add indices por left top and bottom right vertices
-            indices.add(i*VERTICES_PER_QUAD);
-            indices.add(i*VERTICES_PER_QUAD + 2);
+            indices.add(superIndex * VERTICES_PER_QUAD);
+            indices.add(superIndex * VERTICES_PER_QUAD + 2);
 
             startx += charInfo.getWidth();
+            superIndex++;
+
+            if(startx > textWidth)
+                textWidth = startx;
         }
 
-        textHeight = font.getHeight();
-        textWidth = startx;
+        textHeight = ((font.getHeight() + spaceBetweenLines) * line) - spaceBetweenLines;
+        this.textWidth = textWidth;
+
         size = font.getFont().getSize();
 
         float[] positionsArray = UtilResource.listToArray(positions);
@@ -131,6 +165,7 @@ public class TextComponent extends Component {
         int[] indicesArray = indices.stream().mapToInt(i->i).toArray();
         Mesh mesh = new Mesh(positionsArray, textCoordinatesArray, normals, indicesArray);
 
+        // Set material for mesh.
         mesh.setMaterial(new Material(font.getTexture()));
         return mesh;
     }

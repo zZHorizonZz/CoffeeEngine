@@ -7,7 +7,7 @@ import com.horizon.engine.graphics.data.Transformation;
 import com.horizon.engine.graphics.hud.Canvas;
 import com.horizon.engine.graphics.object.Camera;
 import com.horizon.engine.graphics.object.GameObject;
-import com.horizon.engine.graphics.object.hud.objects.BoxView;
+import com.horizon.engine.graphics.hud.objects.BoxView;
 import com.horizon.engine.graphics.object.scene.Scene;
 import com.horizon.engine.graphics.shader.ShaderProgram;
 import com.horizon.engine.graphics.shader.uniform.Uniform;

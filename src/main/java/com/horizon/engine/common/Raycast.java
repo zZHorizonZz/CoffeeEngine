@@ -4,6 +4,8 @@ import com.horizon.engine.GameEngine;
 import com.horizon.engine.component.ComponentType;
 import com.horizon.engine.graphics.object.Camera;
 import com.horizon.engine.graphics.object.GameObject;
+import com.horizon.engine.graphics.object.data.GameObjectTag;
+import com.horizon.engine.graphics.object.scene.Scene;
 import lombok.Data;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -26,6 +28,11 @@ public @Data class Raycast {
         nearFar = new Vector2f();
     }
 
+    public GameObject selectGameObject(Scene scene, Camera camera) {
+        direction = camera.getViewMatrix().positiveZ(direction).negate();
+        return selectGameObject(scene.getSceneObjects().values(), camera.getPosition(), direction);
+    }
+
     public void selectGameObject(Collection<GameObject> gameObjects, Camera camera) {
         direction = camera.getViewMatrix().positiveZ(direction).negate();
         selectGameObject(gameObjects, camera.getPosition(), direction);
@@ -36,10 +43,14 @@ public @Data class Raycast {
         float closestDistance = Float.POSITIVE_INFINITY;
 
         for (GameObject gameObject : gameObjects) {
+            gameObject.setSelected(false);
+
+            if(gameObject.hasTag(GameObjectTag.RAYCAST_IGNORE))
+                continue;
+
             if(gameObject.getComponent(ComponentType.MESH) == null)
                 continue;
 
-            gameObject.setSelected(false);
             min.set(gameObject.getPosition());
             max.set(gameObject.getPosition());
             min.add(-gameObject.getScale().x(), -gameObject.getScale().y(), -gameObject.getScale().z());
@@ -52,7 +63,6 @@ public @Data class Raycast {
 
         if (selectedGameObject != null) {
             selectedGameObject.setSelected(true);
-            GameEngine.getLogger().atInfo().log("Object Selected -> X: " + selectedGameObject.getPosition().x() + " Y: " + selectedGameObject.getPosition().y() + " Z: " + selectedGameObject.getPosition().z());
         }
 
         return selectedGameObject;

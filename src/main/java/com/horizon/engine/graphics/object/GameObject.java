@@ -5,11 +5,14 @@ import com.horizon.engine.common.UtilModel;
 import com.horizon.engine.component.Component;
 import com.horizon.engine.component.ComponentType;
 import com.horizon.engine.component.component.Mesh;
+import com.horizon.engine.graphics.object.data.GameObjectTag;
 import lombok.Data;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 public @Data abstract class GameObject {
@@ -19,10 +22,15 @@ public @Data abstract class GameObject {
     private String gameObjectName;
 
     private Map<ComponentType, Component> components = new LinkedHashMap<ComponentType, Component>();
+    private List<GameObjectTag> gameObjectTags = new LinkedList<>();
 
     private final Vector3f scale;
     private final Vector3f position;
     private final Quaternionf rotation;
+
+    private float xAngle;
+    private float yAngle;
+    private float zAngle;
 
     private Boolean selected;
 
@@ -42,6 +50,8 @@ public @Data abstract class GameObject {
         scale = new Vector3f(1, 1, 1);
         rotation = new Quaternionf();
     }
+
+    public abstract void update();
 
     public Vector3f getPosition() {
         return position;
@@ -79,14 +89,27 @@ public @Data abstract class GameObject {
         return this;
     }
 
+    public GameObject setRotation(float x, float y, float z) {
+        this.xAngle = x;
+        this.yAngle = y;
+        this.zAngle = z;
+
+        getRotation().rotateXYZ((float) Math.toRadians(x), (float) Math.toRadians(y), (float) Math.toRadians(z));
+
+        return this;
+    }
+
     public Quaternionf getRotation() {
         return rotation;
     }
 
     public GameObject setRotation(Quaternionf q) {
         this.rotation.set(q);
-
         return this;
+    }
+
+    public boolean hasTag(GameObjectTag tag) {
+        return gameObjectTags.contains(tag);
     }
 
     public Mesh getMesh() {

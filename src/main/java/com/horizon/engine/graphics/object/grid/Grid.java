@@ -83,4 +83,9 @@ public class Grid extends GameObject {
             index++;
         }
     }
+
+    @Override
+    public void update() {
+
+    }
 }

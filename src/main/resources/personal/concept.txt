@@ -1,0 +1,3 @@
+Game can be some sort of city building strategy with viking theme.
+You must manage your village but mainly manage fire that generates hot.
+Enviroment will be in snow there can be squares with forest/rocks/coal etc.

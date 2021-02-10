@@ -14,6 +14,11 @@ public class DirectionalLight extends GameObject {
         addComponent(new DirectionalLightComponent(new Vector3f(1, 1, 1), new Vector3f(-1, 1.5f, 0), 1.0f));
     }
 
+    @Override
+    public void update() {
+
+    }
+
     public DirectionalLightComponent getDirectionalLight(){
         return (DirectionalLightComponent) getComponent(ComponentType.LIGHT);
     }

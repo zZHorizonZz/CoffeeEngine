@@ -13,9 +13,9 @@ import static org.lwjgl.stb.STBImage.*;
 
 public @Data class Texture {
 
-    private final int id;
-    private final int width;
-    private final int height;
+    private int id;
+    private int width;
+    private int height;
 
     /**
      * Creates an empty texture.
@@ -37,48 +37,54 @@ public @Data class Texture {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     }
 
-    public Texture(String fileName) throws Exception {
-        ByteBuffer buf;
-        // Load Texture file
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            IntBuffer w = stack.mallocInt(1);
-            IntBuffer h = stack.mallocInt(1);
-            IntBuffer channels = stack.mallocInt(1);
+    public Texture(String fileName) {
+        try {
+            ByteBuffer buf;
+            try (MemoryStack stack = MemoryStack.stackPush()) {
+                IntBuffer w = stack.mallocInt(1);
+                IntBuffer h = stack.mallocInt(1);
+                IntBuffer channels = stack.mallocInt(1);
 
-            buf = stbi_load(fileName, w, h, channels, 4);
-            if (buf == null) {
-                throw new Exception("Image file [" + fileName  + "] not loaded: " + stbi_failure_reason());
+                buf = stbi_load(fileName, w, h, channels, 4);
+                if (buf == null) {
+                    throw new Exception("Image file [" + fileName  + "] not loaded: " + stbi_failure_reason());
+                }
+
+                width = w.get();
+                height = h.get();
             }
 
-            width = w.get();
-            height = h.get();
+            this.id = createTexture(buf);
+
+            stbi_image_free(buf);
+        } catch (Exception exception) {
+            exception.printStackTrace();
         }
-
-        this.id = createTexture(buf);
-
-        stbi_image_free(buf);
     }
 
-    public Texture(ByteBuffer imageBuffer) throws Exception {
-        ByteBuffer buf;
-        // Load Texture file
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            IntBuffer w = stack.mallocInt(1);
-            IntBuffer h = stack.mallocInt(1);
-            IntBuffer channels = stack.mallocInt(1);
+    public Texture(ByteBuffer imageBuffer) {
+        try {
+            ByteBuffer buf;
+            try (MemoryStack stack = MemoryStack.stackPush()) {
+                IntBuffer w = stack.mallocInt(1);
+                IntBuffer h = stack.mallocInt(1);
+                IntBuffer channels = stack.mallocInt(1);
 
-            buf = stbi_load_from_memory(imageBuffer, w, h, channels, 4);
-            if (buf == null) {
-                throw new Exception("Image file not loaded: " + stbi_failure_reason());
+                buf = stbi_load_from_memory(imageBuffer, w, h, channels, 4);
+                if (buf == null) {
+                    throw new Exception("Image file not loaded: " + stbi_failure_reason());
+                }
+
+                width = w.get();
+                height = h.get();
             }
 
-            width = w.get();
-            height = h.get();
+            this.id = createTexture(buf);
+
+            stbi_image_free(buf);
+        } catch (Exception exception) {
+            exception.printStackTrace();
         }
-
-        this.id = createTexture(buf);
-
-        stbi_image_free(buf);
     }
 
     private int createTexture(ByteBuffer buf) {

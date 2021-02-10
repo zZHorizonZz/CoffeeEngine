@@ -3,17 +3,12 @@ package com.horizon.engine.graphics.hud;
 import com.horizon.engine.GameEngine;
 import com.horizon.engine.common.Color;
 import com.horizon.engine.component.component.hud.text.TextFont;
-import com.horizon.engine.data.ApplicationSetting;
 import com.horizon.engine.event.data.EventHandler;
 import com.horizon.engine.event.event.ScreenResizeEvent;
-import com.horizon.engine.graphics.object.hud.HudObject;
-import com.horizon.engine.graphics.object.hud.objects.BoxView;
-import com.horizon.engine.graphics.object.hud.orientations.AlignmentData;
-import com.horizon.engine.graphics.object.hud.orientations.AlignmentDistance;
-import com.horizon.engine.graphics.object.hud.orientations.AlignmentPercentage;
-import com.horizon.engine.graphics.object.hud.other.DisplayAnchor;
-import com.horizon.engine.graphics.object.hud.text.TextView;
-import com.horizon.engine.hud.hud.MenuPrefab;
+import com.horizon.engine.graphics.hud.objects.BoxView;
+import com.horizon.engine.graphics.hud.orientations.AlignmentData;
+import com.horizon.engine.graphics.hud.other.DisplayAnchor;
+import com.horizon.engine.graphics.hud.text.TextView;
 import lombok.Getter;
 
 import java.util.Arrays;
@@ -29,9 +24,9 @@ public class Canvas {
     public Canvas(GameEngine gameEngine){
         this.gameEngine = gameEngine;
 
-        MenuPrefab menuPrefab = new MenuPrefab(this, "Debug Menu", 800, 650, DisplayAnchor.CENTER);
+        //MenuObject menuPrefab = new MenuObject(this, "Debug Menu", 800, 650, DisplayAnchor.CENTER);
 
-        menuPrefab.initialize();
+        //menuPrefab.initialize();
 
         gameEngine.getEventManager().registerEventHandlers(this);
     }
@@ -55,7 +50,7 @@ public class Canvas {
         if(alignmentData != null)
             textView.getAlignmentDataList().addAll(Arrays.asList(alignmentData));
 
-        textView.updateObject();
+        textView.update();
 
         initializeObject(textView);
 
@@ -75,7 +70,7 @@ public class Canvas {
     @EventHandler
     public void onScreenResizeEvent(ScreenResizeEvent event){
         for(HudObject hudObject : canvasObjects.values()){
-            hudObject.updateObject();
+            hudObject.update();
         }
 
         //((TextView) getCanvasObjects().get("Test Text")).setText("Data Text");

@@ -21,6 +21,11 @@ public class PointLight extends GameObject {
         addComponent(new PointLightComponent(color, position, intensity));
     }
 
+    @Override
+    public void update() {
+
+    }
+
     public PointLightComponent getPointLight(){
         return (PointLightComponent) getComponent(ComponentType.LIGHT);
     }

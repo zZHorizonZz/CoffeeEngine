@@ -76,10 +76,10 @@ public class Mesh extends Component {
         super(ComponentType.MESH);
         float[] positions = UtilModel.vertexToArray(vertexes);
 
-        this.positions = positions;
-        this.textureCoordinates = textureCoordinates;
-        this.normals = normals;
-        this.indices = indices;
+        this.positions = positions.clone();
+        this.textureCoordinates = textureCoordinates.clone();
+        this.normals = normals.clone();
+        this.indices = indices.clone();
 
         render(positions, textureCoordinates, normals, indices);
     }

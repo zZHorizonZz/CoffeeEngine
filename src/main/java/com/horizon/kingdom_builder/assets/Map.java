@@ -6,6 +6,8 @@ import com.horizon.kingdom_builder.data.GamePalette;
 import lombok.Getter;
 import org.joml.Vector2f;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 import java.util.TreeMap;
 
@@ -32,13 +34,23 @@ public class Map {
     }
 
     public void generateGrassLayer() {
-        for(int x = (int) -(getMapWidth() / 2.0f); x <= getMapWidth() / 2.0f; x += 1.0f){
+        for(int x = (int) -(getMapWidth() / 2.0f); x <= getMapWidth() / 2.0f; x += 1.0f) {
             gridMap.put(x, new TreeMap<Integer, MapSquare>());
 
-            for(int z = (int) -(getMapHeight() / 2.0f); z <= getMapHeight() / 2.0f; z += 1.0f){
+            for(int z = (int) -(getMapHeight() / 2.0f); z <= getMapHeight() / 2.0f; z += 1.0f) {
                 addMapSquare(new MapSquare(getKingdomBuilder().getGameEngine(), new Vector2f(x, z), pickRandomColor()));
             }
         }
+    }
+
+    public List<MapSquare> getMapSquares() {
+        List<MapSquare> mapSquares = new LinkedList<>();
+
+        for(int x = (int) -(getMapWidth() / 2.0f); x <= getMapWidth() / 2.0f; x += 1.0f) {
+            mapSquares.addAll(gridMap.get(x).values());
+        }
+
+        return mapSquares;
     }
 
     //TODO: Rework this to work with perlin noise.

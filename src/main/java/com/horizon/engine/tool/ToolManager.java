@@ -3,8 +3,11 @@ package com.horizon.engine.tool;
 import com.horizon.engine.AbstractManager;
 import com.horizon.engine.GameEngine;
 import com.horizon.engine.Window;
+import com.horizon.engine.data.ApplicationData;
+import com.horizon.engine.hud.hud.DeveloperMenu;
 import com.horizon.engine.input.other.InputHandler;
 import com.horizon.engine.input.other.InputType;
+import lombok.Getter;
 import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
@@ -12,6 +15,8 @@ import org.lwjgl.opengl.GL11;
 public class ToolManager extends AbstractManager {
 
     protected Boolean polygonMode = false;
+
+    @Getter private DeveloperMenu developerMenu;
 
     public ToolManager(GameEngine engine) {
         super(engine, "Tool Manager");
@@ -24,7 +29,8 @@ public class ToolManager extends AbstractManager {
 
     @Override
     public void initialize() {
-
+        if(ApplicationData.isDeveloperMenu())
+            developerMenu = (DeveloperMenu) getGameEngine().getHudManager().createMenu(new DeveloperMenu(getGameEngine().getCanvas()));
     }
 
     @InputHandler(name = "Polygon Mode", input = GLFW.GLFW_KEY_G, inputType = InputType.KEY_DOWN)
@@ -35,6 +41,15 @@ public class ToolManager extends AbstractManager {
         }else{
             GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
             polygonMode = false;
+        }
+    }
+
+    @InputHandler(name = "Developer Menu", input = GLFW.GLFW_KEY_F5, inputType = InputType.KEY_DOWN)
+    public void onDeveloperMenu(){
+        if(!developerMenu.isShowMenu()) {
+            developerMenu.setShowMenu(true);
+        }else{
+            developerMenu.setShowMenu(false);
         }
     }
 

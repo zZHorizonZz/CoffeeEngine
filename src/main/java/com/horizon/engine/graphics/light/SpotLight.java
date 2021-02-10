@@ -22,6 +22,11 @@ public class SpotLight extends GameObject {
         addComponent(new SpotLightComponent(color, position, intensity, coneDirection, cutOffAngle));
     }
 
+    @Override
+    public void update() {
+
+    }
+
     public SpotLightComponent getSpotLight(){
         return (SpotLightComponent) getComponent(ComponentType.LIGHT);
     }

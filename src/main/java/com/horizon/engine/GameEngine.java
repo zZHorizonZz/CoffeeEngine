@@ -3,6 +3,9 @@ package com.horizon.engine;
 import com.google.common.flogger.FluentLogger;
 import com.horizon.engine.asset.AssetManager;
 import com.horizon.engine.event.EventManager;
+import com.horizon.engine.graphics.hud.Canvas;
+import com.horizon.engine.graphics.object.scene.Scene;
+import com.horizon.engine.hud.HudManager;
 import com.horizon.engine.input.InputManager;
 import com.horizon.engine.input.other.MouseInput;
 import com.horizon.engine.model.ModelManager;
@@ -29,6 +32,7 @@ public class GameEngine implements Runnable {
     @Getter private ToolManager toolManager;
     @Getter private EventManager eventManager;
     @Getter private AssetManager assetManager;
+    @Getter private HudManager hudManager;
 
     @Getter private long lastTime = System.currentTimeMillis();
     @Getter private long currentFramesPerSecond = 0;
@@ -63,7 +67,6 @@ public class GameEngine implements Runnable {
         assetManager = new AssetManager(this);
         inputManager = new InputManager(this);
         modelManager = new ModelManager(this);
-        toolManager = new ToolManager(this);
         eventManager = new EventManager(this);
 
         loadAssets();
@@ -71,6 +74,15 @@ public class GameEngine implements Runnable {
         //Final initialization
         gameLogic.setGameEngine(this);
         gameLogic.initialize();
+
+        postInitialize();
+    }
+
+    protected void postInitialize() {
+        hudManager = new HudManager(this);
+        toolManager = new ToolManager(this);
+
+        toolManager.initialize();
     }
 
     protected void loadAssets() {
@@ -136,6 +148,7 @@ public class GameEngine implements Runnable {
 
     protected void update(float interval) {
         gameLogic.onUpdate(interval, mouseInput);
+        getHudManager().getFpsCounter().update();
     }
 
     protected void render() {
@@ -159,5 +172,13 @@ public class GameEngine implements Runnable {
 
     public long getTime() {
         return System.currentTimeMillis();
+    }
+
+    public Scene getScene() {
+        return getGameLogic().getScene();
+    }
+
+    public Canvas getCanvas() {
+        return getGameLogic().getCanvas();
     }
 }

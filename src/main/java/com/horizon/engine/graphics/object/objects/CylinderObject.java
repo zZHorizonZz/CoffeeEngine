@@ -17,4 +17,9 @@ public class CylinderObject extends GameObject {
         this.scaleY = scaleY;
         this.scaleZ = scaleZ;
     }
+
+    @Override
+    public void update() {
+
+    }
 }

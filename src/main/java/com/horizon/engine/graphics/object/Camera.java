@@ -1,6 +1,8 @@
 package com.horizon.engine.graphics.object;
 
 import com.horizon.engine.common.Color;
+import com.horizon.engine.common.Raycast;
+import com.horizon.engine.common.RaycastDisplay;
 import com.horizon.engine.graphics.data.Transformation;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,17 +16,26 @@ public class Camera {
 
     @Getter @Setter private Matrix4f viewMatrix;
 
+    @Getter private final Raycast raycast;
+    @Getter private final RaycastDisplay raycastDisplay;
+
     @Getter @Setter private Color backgroundColor = Color.BACKGROUND;
 
     public Camera() {
         position = new Vector3f();
         rotation = new Vector3f();
         viewMatrix = new Matrix4f();
+
+        raycast = new Raycast();
+        raycastDisplay = new RaycastDisplay();
     }
 
     public Camera(Vector3f position, Vector3f rotation) {
         this.position = position;
         this.rotation = rotation;
+
+        raycast = new Raycast();
+        raycastDisplay = new RaycastDisplay();
     }
 
     public void setPosition(float x, float y, float z) {
@@ -52,13 +63,10 @@ public class Camera {
     }
 
     public void moveRotation(float offsetX, float offsetY, float offsetZ) {
-        rotation.x += offsetX;
+        if(rotation.x() + offsetX < 80 && rotation.x() + offsetX > -80)
+            rotation.x += offsetX;
         rotation.y += offsetY;
         rotation.z += offsetZ;
-    }
-
-    public Matrix4f getViewMatrix() {
-        return viewMatrix;
     }
 
     public Matrix4f updateViewMatrix() {

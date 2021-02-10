@@ -3,6 +3,7 @@ package com.horizon.engine.common;
 import com.horizon.engine.graphics.data.Vertex;
 
 import java.nio.FloatBuffer;
+import java.text.DecimalFormat;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -37,7 +38,7 @@ public class UtilModel {
         return list;
     }
 
-    public static List<Vertex> upScaleModel(List<Vertex> vertices, Float scaleX, Float scaleY, Float scaleZ){
+    public static List<Vertex> upScaleModel(List<Vertex> vertices, float scaleX, float scaleY, float scaleZ){
         for(Vertex vertex : vertices){
             vertex.setX(vertex.getX() * scaleX);
             vertex.setY(vertex.getY() * scaleY);
@@ -47,15 +48,11 @@ public class UtilModel {
         return vertices;
     }
 
-    public static float[] upScalePositions(float[] positions, Float scaleX, Float scaleY, Float scaleZ){
-        int position = 0;
-        for(int i = 1; i <= positions.length / 3; i++) {
-            positions[position] = positions[position] * scaleX;
-            position++;
-            positions[position] = positions[position] * scaleY;
-            position++;
-            positions[position] = positions[position] * scaleZ;
-            position++;
+    public static float[] upScalePositions(float[] positions, float scaleX, float scaleY, float scaleZ){
+        for(int i = 0; i < positions.length; i += 3) {
+            positions[i] = positions[i] * scaleX;
+            positions[i + 1] = positions[i + 1] * scaleY;
+            positions[i + 2] = positions[i + 2] * scaleZ;
         }
 
         return positions;

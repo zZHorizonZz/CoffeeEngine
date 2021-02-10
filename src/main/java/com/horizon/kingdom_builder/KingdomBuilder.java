@@ -3,31 +3,27 @@ package com.horizon.kingdom_builder;
 import com.horizon.engine.AbstractGameLogic;
 import com.horizon.engine.Window;
 import com.horizon.engine.component.ComponentType;
-import com.horizon.engine.component.component.light.Light;
 import com.horizon.engine.graphics.hud.Canvas;
 import com.horizon.engine.graphics.light.PointLight;
-import com.horizon.engine.graphics.light.SpotLight;
 import com.horizon.engine.graphics.object.Camera;
 import com.horizon.engine.graphics.object.GameObject;
 import com.horizon.engine.graphics.object.scene.Scene;
 import com.horizon.engine.graphics.render.Renderer;
 import com.horizon.engine.input.other.MouseInput;
-import com.horizon.engine.tool.FPSCounter;
-import com.horizon.game.building.house.TestObject;
-import com.horizon.game.controlls.ControllerManager;
 import com.horizon.game.testing.TestManager;
 import com.horizon.kingdom_builder.assets.Map;
+import com.horizon.kingdom_builder.controlls.ControllerManager;
+import com.horizon.kingdom_builder.gameplay.building.BuildingManager;
 import lombok.Getter;
 import org.joml.Vector3f;
 
 public class KingdomBuilder  extends AbstractGameLogic {
 
-    @Getter private FPSCounter fpsCounter;
-
     private final Renderer renderer;
 
     @Getter private TestManager testManager;
     @Getter private ControllerManager controllerManager;
+    @Getter private BuildingManager buildingManager;
 
     private Vector3f ambientLight;
     private PointLight pointLight;
@@ -49,15 +45,15 @@ public class KingdomBuilder  extends AbstractGameLogic {
         setCanvas(new Canvas(getGameEngine()));
 
         controllerManager = new ControllerManager(getGameEngine());
-        controllerManager.initialize();
+        buildingManager = new BuildingManager(this);
 
         preLoadMeshes();
-
         loadLights();
 
-        gameMap = new Map(this, 10, 10);
+        gameMap = new Map(this, 20, 20);
 
-        fpsCounter = new FPSCounter(getGameEngine());
+        controllerManager.initialize();
+        buildingManager.initialize();
     }
 
     protected void preLoadMeshes() {
@@ -80,8 +76,7 @@ public class KingdomBuilder  extends AbstractGameLogic {
     @Override
     public void onUpdate(float interval, MouseInput mouseInput) {
         getControllerManager().onUpdate(mouseInput);
-
-        getFpsCounter().update();
+        getBuildingManager().update();
     }
 
     @Override

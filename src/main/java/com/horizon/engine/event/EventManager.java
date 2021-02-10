@@ -36,11 +36,23 @@ public class EventManager extends AbstractManager {
                 Method method = getEventMap().get(handler).getKey();
                 Object methodObject = getEventMap().get(handler).getValue();
 
+                if(!isEvent(method, event))
+                    continue;
+
                 method.invoke(methodObject, event);
             }
         }catch(Exception exception){
             exception.printStackTrace();
         }
+    }
+
+    private boolean isEvent(Method method, Event event) {
+        for(Class<?> parameter : method.getParameterTypes()) {
+            if(parameter.getSimpleName().equalsIgnoreCase(event.getClass().getSimpleName()))
+                return true;
+        }
+
+        return false;
     }
 
     public void registerEventHandlers(Object object) {

@@ -5,10 +5,13 @@ import com.horizon.engine.graphics.data.MeshData;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 public class UtilModelLoader {
+
+    private static final DecimalFormat formatter = new DecimalFormat("0.0000");
 
     public static MeshData loadMesh(String fileName){
         try{
@@ -33,6 +36,7 @@ public class UtilModelLoader {
                                 Float.parseFloat(tokens[1]),
                                 Float.parseFloat(tokens[2]),
                                 Float.parseFloat(tokens[3]));
+
                         vertices.add(vec3f);
                         break;
                     case "vt":
@@ -80,6 +84,7 @@ public class UtilModelLoader {
             posArr[i * 3] = pos.x;
             posArr[i * 3 + 1] = pos.y;
             posArr[i * 3 + 2] = pos.z;
+
             i++;
         }
         float[] textCoordArr = new float[posList.size() * 2];

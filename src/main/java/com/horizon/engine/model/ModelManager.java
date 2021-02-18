@@ -2,8 +2,7 @@ package com.horizon.engine.model;
 
 import com.horizon.engine.AbstractManager;
 import com.horizon.engine.GameEngine;
-import com.horizon.engine.graphics.data.MeshData;
-import com.horizon.engine.graphics.data.Vertex;
+import com.horizon.engine.asset.prefab.data.MeshData;
 
 import java.util.*;
 

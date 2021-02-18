@@ -15,6 +15,10 @@ public class ApplicationData {
     @Getter @Setter private static String windowTitle = "Test Game";
     @Getter @Setter private static boolean vSync = true;
     @Getter @Setter private static Vector2f windowSize = new Vector2f(1080,720);
+    @Getter @Setter private static boolean compatibleProfile = true;
+    @Getter @Setter private static boolean backFaceCulling = false;
+    @Getter @Setter private static boolean frustumCulling = true;
+    @Getter @Setter private static boolean antialiasing = true;
 
     //System Stuff
     @Getter @Setter private static Random random = new Random();
@@ -27,4 +31,8 @@ public class ApplicationData {
     @Getter @Setter private static Color topBar = new Color(255.0f, 210.0f, 130.0f, 255.0f);
     @Getter @Setter private static Color accept = new Color(0.0f, 160.0f, 0.0f, 255.0f);
     @Getter @Setter private static Color deny = new Color(160.0f, 0.0f, 0.0f, 255.0f);
+
+    //Post Processing
+    @Getter @Setter private static Color defaultFogColor = new Color(239.0f, 250.0f, 255.0f, 255.0f);
+    @Getter @Setter private static float fogDensity = 0.0f;
 }

@@ -2,11 +2,15 @@ package com.horizon.kingdom_builder;
 
 import com.horizon.engine.AbstractGameLogic;
 import com.horizon.engine.Window;
+import com.horizon.engine.common.Color;
 import com.horizon.engine.component.ComponentType;
+import com.horizon.engine.debug.Debugger;
+import com.horizon.engine.graphics.data.Material;
 import com.horizon.engine.graphics.hud.Canvas;
-import com.horizon.engine.graphics.light.PointLight;
 import com.horizon.engine.graphics.object.Camera;
 import com.horizon.engine.graphics.object.GameObject;
+import com.horizon.engine.graphics.object.objects.ModelObject;
+import com.horizon.engine.graphics.object.primitive.PrimitiveObject;
 import com.horizon.engine.graphics.object.scene.Scene;
 import com.horizon.engine.graphics.render.Renderer;
 import com.horizon.engine.input.other.MouseInput;
@@ -25,11 +29,9 @@ public class KingdomBuilder  extends AbstractGameLogic {
     @Getter private ControllerManager controllerManager;
     @Getter private BuildingManager buildingManager;
 
-    private Vector3f ambientLight;
-    private PointLight pointLight;
-
     @Getter private Map gameMap;
 
+    @Getter private ModelObject testObject;
 
     public KingdomBuilder() {
         renderer = new Renderer();
@@ -40,7 +42,7 @@ public class KingdomBuilder  extends AbstractGameLogic {
         renderer.initialize(getGameEngine().getWindow());
 
         setScene(new Scene(getGameEngine()));
-        getScene().initialize();
+        setSceneInitialized(getScene().initialize());
 
         setCanvas(new Canvas(getGameEngine()));
 
@@ -50,22 +52,36 @@ public class KingdomBuilder  extends AbstractGameLogic {
         preLoadMeshes();
         loadLights();
 
-        gameMap = new Map(this, 20, 20);
+        //gameMap = new Map(this, 20, 20);
+
+        ModelObject cubeObject = getScene().instantiate(PrimitiveObject.CUBE);
+        cubeObject.setRotation(0.0f, 45.0f, 0.0f);
+        cubeObject.setPosition(1.0f, 2.5f, 1.0f);
+
+        testObject = getScene().instantiate(PrimitiveObject.CUBE);
+        testObject.getMesh().setMaterial(new Material(Color.RED));
+
+        ModelObject planeObject = (ModelObject) getScene().instantiate(PrimitiveObject.PLANE);
+        planeObject.getMesh().setMaterial(new Material(Color.GREEN));
+        planeObject.setPosition(0.0f, -1.5f, 0.0f);
+        planeObject.setRotation(0.0f, 45.0f, 0.0f);
+        planeObject.setScale(3.0f, 1.0f, 3.0f);
 
         controllerManager.initialize();
         buildingManager.initialize();
     }
 
     protected void preLoadMeshes() {
-        getGameEngine().getAssetManager().loadMesh("/models", "roof01.obj");
-        getGameEngine().getAssetManager().loadMesh("/models", "room01.obj");
-        getGameEngine().getAssetManager().loadMesh("/models", "tree.obj");
+        getGameEngine().getAssetManager().loadModel("/models", "roof01.obj");
+        getGameEngine().getAssetManager().loadModel("/models", "room01.obj");
+        getGameEngine().getAssetManager().loadModel("/models", "forest.obj");
     }
 
     protected void loadLights() {
-        ambientLight = new Vector3f(0.3f, 0.3f, 0.3f);
+        getScene().getSceneLight().setAmbientLight(new Vector3f(0.3f, 0.3f, 0.3f));
 
-        getScene().getDirectionalLight().getDirectionalLight().setDirection(ambientLight);
+        Vector3f lightDirection = new Vector3f(1, 1, 1);
+        getScene().getSceneLight().getDirectionalLight().getDirectionalLight().setDirection(lightDirection);
     }
 
     @Override
@@ -75,8 +91,8 @@ public class KingdomBuilder  extends AbstractGameLogic {
 
     @Override
     public void onUpdate(float interval, MouseInput mouseInput) {
-        getControllerManager().onUpdate(mouseInput);
-        getBuildingManager().update();
+        controllerManager.onUpdate(mouseInput);
+        //buildingManager.update();
     }
 
     @Override
@@ -85,7 +101,7 @@ public class KingdomBuilder  extends AbstractGameLogic {
         if(camera == null)
             return;
 
-        renderer.render(window, camera, getScene(), getCanvas(), ambientLight);
+        renderer.render(window, camera, getScene(), getCanvas());
     }
 
     @Override

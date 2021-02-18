@@ -9,12 +9,10 @@ import com.horizon.engine.graphics.light.PointLight;
 import com.horizon.engine.graphics.light.SpotLight;
 import com.horizon.engine.graphics.object.Camera;
 import com.horizon.engine.graphics.object.GameObject;
-import com.horizon.engine.graphics.object.objects.CubeObject;
 import com.horizon.engine.graphics.object.scene.Scene;
 import com.horizon.engine.graphics.render.Renderer;
 import com.horizon.engine.input.other.MouseInput;
 import com.horizon.engine.tool.FPSCounter;
-import com.horizon.game.building.house.TestObject;
 import com.horizon.game.controlls.ControllerManager;
 import com.horizon.game.testing.TestManager;
 import lombok.Getter;
@@ -28,8 +26,6 @@ public class DummyGame extends AbstractGameLogic {
 
     @Getter private TestManager testManager;
     @Getter private ControllerManager controllerManager;
-
-    @Getter private CubeObject player;
 
     private Vector3f ambientLight;
     private PointLight pointLight;
@@ -52,8 +48,6 @@ public class DummyGame extends AbstractGameLogic {
         controllerManager = new ControllerManager(getGameEngine());
         controllerManager.initialize();
 
-        new TestObject(getGameEngine(), getScene());
-
         ambientLight = new Vector3f(0.3f, 0.3f, 0.3f);
 
         // Point Light
@@ -69,8 +63,8 @@ public class DummyGame extends AbstractGameLogic {
 
         lightPosition = new Vector3f(-1, 0, 0);
 
-        getScene().initializeObject(pointLight);
-        getScene().initializeObject(spotLight);
+        getScene().instantiate(pointLight);
+        getScene().instantiate(spotLight);
 
         fpsCounter = new FPSCounter(getGameEngine());
     }
@@ -86,7 +80,7 @@ public class DummyGame extends AbstractGameLogic {
 
         getFpsCounter().update();
         //player.setPosition(player.getPosition().x + x * 0.01f, player.getPosition().y, player.getPosition().z + z * 0.01f);
-        //player.getMesh().updatePositions(UtilModel.upScaleModel(player.getMesh().getPositions(), x == 0 ? 1 : x * 0.01f, 1.0f, z == 0 ? 1 : z * 0.01f));
+        //player.getModel().updatePositions(UtilModel.upScaleModel(player.getModel().getPositions(), x == 0 ? 1 : x * 0.01f, 1.0f, z == 0 ? 1 : z * 0.01f));
     }
 
     @Override
@@ -95,7 +89,7 @@ public class DummyGame extends AbstractGameLogic {
         if(camera == null)
             return;
 
-        renderer.render(window, camera, getScene(), getCanvas(), ambientLight);
+        renderer.render(window, camera, getScene(), getCanvas());
     }
 
     @Override

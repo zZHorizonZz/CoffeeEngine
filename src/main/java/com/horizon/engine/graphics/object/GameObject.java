@@ -4,7 +4,7 @@ import com.horizon.engine.GameEngine;
 import com.horizon.engine.common.UtilModel;
 import com.horizon.engine.component.Component;
 import com.horizon.engine.component.ComponentType;
-import com.horizon.engine.component.component.Mesh;
+import com.horizon.engine.component.component.mesh.Mesh;
 import com.horizon.engine.graphics.object.data.GameObjectTag;
 import lombok.Data;
 import org.joml.Quaternionf;
@@ -32,7 +32,12 @@ public @Data abstract class GameObject {
     private float yAngle;
     private float zAngle;
 
-    private Boolean selected;
+    private boolean selected;
+
+    private int texturePosition;
+
+    private boolean disableFrustumCulling;
+    private boolean insideFrustum;
 
     public GameObject(GameEngine gameEngine, String gameObjectName, Mesh mesh) {
         this.gameEngine = gameEngine;

@@ -4,8 +4,10 @@ import com.horizon.engine.common.Font;
 import com.horizon.engine.common.UtilResource;
 import com.horizon.engine.component.Component;
 import com.horizon.engine.component.ComponentType;
-import com.horizon.engine.component.component.Mesh;
+import com.horizon.engine.component.component.mesh.DisplayMesh;
+import com.horizon.engine.component.component.mesh.Mesh;
 import com.horizon.engine.graphics.data.Material;
+import com.horizon.engine.graphics.hud.HudObject;
 import com.horizon.engine.graphics.object.GameObject;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,55 +31,55 @@ public class TextComponent extends Component {
     private final float ZPOS = 0.0f;
     private final int VERTICES_PER_QUAD = 4;
 
-    protected GameObject gameObject;
+    protected HudObject gameObject;
 
-    public TextComponent(GameObject gameObject) {
+    public TextComponent(HudObject gameObject) {
         super(ComponentType.TEXT);
 
         this.gameObject = gameObject;
     }
 
     public void initializeText(){
-        gameObject.addComponent(buildMesh(getFont().getFont()));
+        gameObject.setDisplayMesh(buildMesh(getFont().getFont()));
     }
 
     public void setSize(int size) {
         this.size = size;
 
-        if(gameObject.getMesh() == null)
+        if(gameObject.getDisplayMesh() == null)
             return;
 
-        gameObject.getMesh().cleanUp();
+        gameObject.getDisplayMesh().cleanUp();
 
         if(isBold())
             getFont().getFont().setFont(getFont().getFont().getFont().deriveFont(java.awt.Font.BOLD, getSize()));
         else
             getFont().getFont().setFont(getFont().getFont().getFont().deriveFont(java.awt.Font.PLAIN, getSize()));
 
-        gameObject.getComponents().replace(ComponentType.MESH, buildMesh(getFont().getFont()));
+        gameObject.setDisplayMesh(buildMesh(getFont().getFont()));
     }
 
     public void setBold(boolean bold) {
         this.bold = bold;
 
-        if(gameObject.getMesh() == null)
+        if(gameObject.getDisplayMesh() == null)
             return;
 
-        gameObject.getMesh().cleanUp();
-        gameObject.getComponents().replace(ComponentType.MESH, buildMesh(getFont().getFont()));
+        gameObject.getDisplayMesh().cleanUp();
+        gameObject.setDisplayMesh(buildMesh(getFont().getFont()));
     }
 
     public void setSpaceBetweenLines(float spaceBetweenLines) {
         this.spaceBetweenLines = spaceBetweenLines;
 
-        if(gameObject.getMesh() == null)
+        if(gameObject.getDisplayMesh() == null)
             return;
 
-        gameObject.getMesh().cleanUp();
-        gameObject.getComponents().replace(ComponentType.MESH, buildMesh(getFont().getFont()));
+        gameObject.getDisplayMesh().cleanUp();
+        gameObject.setDisplayMesh(buildMesh(getFont().getFont()));
     }
 
-    private Mesh buildMesh(Font font) {
+    private DisplayMesh buildMesh(Font font) {
         List<Float> positions = new ArrayList<>();
         List<Float> textureCoordinates = new ArrayList<>();
         List<Integer> indices   = new ArrayList<>();
@@ -163,7 +165,7 @@ public class TextComponent extends Component {
         float[] textCoordinatesArray = UtilResource.listToArray(textureCoordinates);
 
         int[] indicesArray = indices.stream().mapToInt(i->i).toArray();
-        Mesh mesh = new Mesh(positionsArray, textCoordinatesArray, normals, indicesArray);
+        DisplayMesh mesh = new DisplayMesh(positionsArray, textCoordinatesArray, indicesArray);
 
         // Set material for mesh.
         mesh.setMaterial(new Material(font.getTexture()));

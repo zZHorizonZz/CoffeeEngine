@@ -4,7 +4,9 @@ import com.horizon.engine.common.Color;
 import com.horizon.kingdom_builder.KingdomBuilder;
 import com.horizon.kingdom_builder.data.GamePalette;
 import lombok.Getter;
+import org.joml.SimplexNoise;
 import org.joml.Vector2f;
+import org.lwjgl.stb.STBPerlin;
 
 import java.util.LinkedList;
 import java.util.List;

@@ -13,6 +13,8 @@ public abstract class AbstractGameLogic {
     @Getter @Setter private Scene scene;
     @Getter @Setter private Canvas canvas;
 
+    @Getter @Setter private boolean sceneInitialized = false;
+
     public abstract void initialize() throws Exception;
 
     public abstract void onInput(Window window, MouseInput mouseInput);

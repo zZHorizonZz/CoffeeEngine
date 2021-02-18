@@ -5,9 +5,11 @@ import com.horizon.engine.common.file.File;
 import com.horizon.engine.graphics.hud.Canvas;
 import com.horizon.engine.graphics.object.Camera;
 import com.horizon.engine.graphics.object.scene.Scene;
+import com.horizon.engine.graphics.render.Renderer;
 import com.horizon.engine.graphics.shader.uniform.Uniform;
 import lombok.Data;
 import org.joml.Matrix4f;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.opengl.GL11;
@@ -15,6 +17,7 @@ import org.lwjgl.opengl.GL32;
 import org.lwjgl.system.MemoryStack;
 
 import java.io.BufferedReader;
+import java.nio.FloatBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,10 +25,14 @@ import static org.lwjgl.opengl.GL20.*;
 
 public @Data abstract class ShaderProgram {
 
+    private Renderer renderer;
+
     private int programID;
     private final Map<String, Integer> uniforms;
 
-    public ShaderProgram(File vertexFile, File fragmentFile, String... inVariables) {
+    public ShaderProgram(Renderer renderer, File vertexFile, File fragmentFile, String... inVariables) {
+        this.renderer = renderer;
+
         int vertexShaderID = loadShader(vertexFile, GL_VERTEX_SHADER);
         int fragmentShaderID = loadShader(fragmentFile, GL_FRAGMENT_SHADER);
 
@@ -67,7 +74,7 @@ public @Data abstract class ShaderProgram {
         glDeleteShader(fragmentShaderID);
     }
 
-    public abstract void render(Window window, Camera camera, Scene scene, Canvas canvas, Vector3f ambientLight);
+    public abstract void render(Window window, Camera camera, Scene scene, Canvas canvas);
 
     public abstract void initialize();
 
@@ -86,6 +93,12 @@ public @Data abstract class ShaderProgram {
         }
     }
 
+    public void storeListUniform(String uniformName, int size) {
+        for (int i=0; i<size; i++) {
+            storeAllUniformLocations(new Uniform(uniformName + "[" + i + "]"));
+        }
+    }
+
     public void setUniformMatrix4(String uniformName, Matrix4f value) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             glUniformMatrix4fv(uniforms.get(uniformName), false, value.get(stack.mallocFloat(16)));
@@ -100,12 +113,34 @@ public @Data abstract class ShaderProgram {
         glUniform1f(uniforms.get(uniformName), value);
     }
 
+    public void setUniformFloat(String uniformName, float value, int index) {
+        setUniformFloat(uniformName + "[" + index  + "]", value);
+    }
+
+    public void setUniformVector2f(String uniformName, Vector2f value) {
+        glUniform2f(uniforms.get(uniformName), value.x, value.y);
+    }
+
     public void setUniformVector3f(String uniformName, Vector3f value) {
         glUniform3f(uniforms.get(uniformName), value.x, value.y, value.z);
     }
 
     public void setUniformVector4f(String uniformName, Vector4f value) {
         glUniform4f(uniforms.get(uniformName), value.x, value.y, value.z, value.w);
+    }
+    public void setUniformMatrix4(String uniformName, Matrix4f value, int index) {
+        setUniformMatrix4(uniformName + "[" + index  + "]", value);
+    }
+
+    public void setUniformMatrix4(String uniformName, Matrix4f[] matrices) {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            int length = matrices != null ? matrices.length : 0;
+            FloatBuffer fb = stack.mallocFloat(16 * length);
+            for (int i = 0; i < length; i++) {
+                matrices[i].get(16 * i, fb);
+            }
+            glUniformMatrix4fv(uniforms.get(uniformName), false, fb);
+        }
     }
 
     protected void validateProgram(){

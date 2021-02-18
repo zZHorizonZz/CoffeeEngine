@@ -1,6 +1,7 @@
 package com.horizon.engine.common;
 
 import lombok.Data;
+import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 public @Data class Color {
@@ -18,28 +19,32 @@ public @Data class Color {
     private Float blueValue;
     private Float alphaValue;
 
-    public Color(Float red, Float green, Float blue, Float alpha){
+    public Color(Float red, Float green, Float blue, Float alpha) {
         this.redValue = red;
         this.greenValue = green;
         this.blueValue = blue;
         this.alphaValue = alpha;
     }
 
-    public Color(Float red, Float green, Float blue){
+    public Color(Float red, Float green, Float blue) {
         this.redValue = red;
         this.greenValue = green;
         this.blueValue = blue;
         this.alphaValue = 255.0f;
     }
 
-    public Color(Vector4f vector4f){
+    public Color(Vector4f vector4f) {
         this.redValue = vector4f.x() * 255;
         this.greenValue = vector4f.y() * 255;
         this.blueValue = vector4f.z() * 255;
         this.alphaValue = vector4f.w() * 255;
     }
 
-    public Vector4f toVector4f(){
+    public Vector4f toVector4f() {
         return new Vector4f(1.0f / 255.0f * redValue, 1.0f / 255.0f * greenValue, 1.0f / 255.0f * blueValue, 1.0f / 255.0f * alphaValue);
+    }
+
+    public Vector3f toVector3f() {
+        return new Vector3f(1.0f / 255.0f * redValue, 1.0f / 255.0f * greenValue, 1.0f / 255.0f * blueValue);
     }
 }

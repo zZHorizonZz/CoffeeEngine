@@ -1,6 +1,6 @@
 package com.horizon.engine.component;
 
-import com.horizon.engine.component.component.Mesh;
+import com.horizon.engine.component.component.mesh.Mesh;
 import com.horizon.engine.component.component.light.Light;
 import com.horizon.engine.component.component.hud.text.TextComponent;
 

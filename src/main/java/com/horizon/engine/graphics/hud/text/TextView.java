@@ -62,9 +62,9 @@ public class TextView extends HudObject {
     }
 
     public void cleanUp(){
-        if(getMesh() != null) {
-            getMesh().cleanUp();
-            getMesh().cleanUpTexture();
+        if(getDisplayMesh() != null) {
+            getDisplayMesh().cleanUp();
+            getDisplayMesh().cleanUpTexture();
         }
     }
 

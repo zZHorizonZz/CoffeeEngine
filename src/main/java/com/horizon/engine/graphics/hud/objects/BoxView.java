@@ -2,7 +2,8 @@ package com.horizon.engine.graphics.hud.objects;
 
 import com.horizon.engine.GameEngine;
 import com.horizon.engine.common.Color;
-import com.horizon.engine.component.component.Mesh;
+import com.horizon.engine.component.component.mesh.DisplayMesh;
+import com.horizon.engine.component.component.mesh.Mesh;
 import com.horizon.engine.graphics.data.Material;
 import com.horizon.engine.graphics.hud.HudObject;
 import lombok.Getter;
@@ -38,16 +39,16 @@ public class BoxView extends HudObject {
                 (width / 2),(height / 2)
         };
 
-        Mesh mesh = new Mesh(positions);
+        DisplayMesh mesh = new DisplayMesh(positions);
         mesh.setMaterial(new Material(color));
 
-        addComponent(mesh);
+        setDisplayMesh(mesh);
     }
 
     public void setColor(Color color){
         this.color = color;
 
-        getMesh().setMaterial(new Material(color));
+        getDisplayMesh().setMaterial(new Material(color));
     }
 
     @Override
@@ -72,7 +73,7 @@ public class BoxView extends HudObject {
 
     @Override
     public void setSize(float width, float height) {
-        Mesh mesh = getMesh();
+        DisplayMesh mesh = getDisplayMesh();
         this.width = width;
         this.height = height;
 

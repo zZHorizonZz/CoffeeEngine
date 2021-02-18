@@ -1,6 +1,6 @@
 package com.horizon.engine.common;
 
-import com.horizon.engine.graphics.data.Texture;
+import com.horizon.engine.graphics.texture.Texture;
 import lombok.Getter;
 
 import javax.imageio.ImageIO;

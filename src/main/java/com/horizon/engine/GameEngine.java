@@ -2,6 +2,7 @@ package com.horizon.engine;
 
 import com.google.common.flogger.FluentLogger;
 import com.horizon.engine.asset.AssetManager;
+import com.horizon.engine.debug.Debugger;
 import com.horizon.engine.event.EventManager;
 import com.horizon.engine.graphics.hud.Canvas;
 import com.horizon.engine.graphics.object.scene.Scene;
@@ -19,6 +20,7 @@ public class GameEngine implements Runnable {
     public static final int TARGET_UPS = 30;
 
     @Getter private static final FluentLogger logger = FluentLogger.forEnclosingClass();
+    @Getter private Debugger debugger;
 
     @Getter private final Window window;
     @Getter private final Timer timer;
@@ -43,6 +45,7 @@ public class GameEngine implements Runnable {
         mouseInput = new MouseInput();
         this.gameLogic = gameLogic;
         timer = new Timer();
+        this.debugger = new Debugger(this);
     }
 
     @Override
@@ -86,15 +89,9 @@ public class GameEngine implements Runnable {
     }
 
     protected void loadAssets() {
-        loadBasicModels();
-        loadFonts();
-    }
+        assetManager.initialize();
 
-    protected void loadBasicModels() {
-        getAssetManager().loadMesh("/models", "plane.obj");
-        getAssetManager().loadMesh("/models", "cone.obj");
-        getAssetManager().loadMesh("/models", "cube.obj");
-        getAssetManager().loadMesh("/models", "cylinder.obj");
+        loadFonts();
     }
 
     protected void loadFonts() {

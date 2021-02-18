@@ -61,14 +61,14 @@ public class EventManager extends AbstractManager {
                 GameEngine.getLogger().atInfo().log("Input Handler was been found in class " + object.getClass().getSimpleName());
 
                 EventHandler eventHandler = method.getAnnotation(EventHandler.class);
-                registerEventHandler(eventHandler, eventHandler.getClass().getSimpleName(), method, object);
+                registerEventHandler(method, object);
 
                 GameEngine.getLogger().atInfo().log("Input Handler " + eventHandler.getClass().getSimpleName());
             }
         }
     }
 
-    public void registerEventHandler(EventHandler eventHandler, String label, Method method, Object object) {
-        getEventMap().put(this.getGameEngine().getWindow().getTitle() + ':' + label.toLowerCase(), new AbstractMap.SimpleEntry<Method, Object>(method, object));
+    public void registerEventHandler(Method method, Object object) {
+        getEventMap().put(this.getGameEngine().getWindow().getTitle() + ':' + object.getClass().getSimpleName() + ":" + method.getName(), new AbstractMap.SimpleEntry<Method, Object>(method, object));
     }
 }

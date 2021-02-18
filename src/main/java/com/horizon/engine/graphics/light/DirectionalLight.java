@@ -11,7 +11,7 @@ public class DirectionalLight extends GameObject {
     public DirectionalLight(GameEngine gameEngine) {
         super(gameEngine, "Directional Light");
 
-        addComponent(new DirectionalLightComponent(new Vector3f(1, 1, 1), new Vector3f(-1, 1.5f, 0), 1.0f));
+        addComponent(new DirectionalLightComponent(new Vector3f(1, 1, 1), new Vector3f(0, 1.5f, 1), 1.0f));
     }
 
     @Override

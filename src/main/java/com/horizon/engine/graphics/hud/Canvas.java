@@ -12,21 +12,17 @@ import com.horizon.engine.graphics.hud.text.TextView;
 import lombok.Getter;
 
 import java.util.Arrays;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Map;
 
 public class Canvas {
 
     @Getter private final GameEngine gameEngine;
 
-    @Getter private final Map<String, HudObject> canvasObjects = new LinkedHashMap<>();
+    @Getter private final Map<String, HudObject> canvasObjects = new HashMap<>();
 
     public Canvas(GameEngine gameEngine){
         this.gameEngine = gameEngine;
-
-        //MenuObject menuPrefab = new MenuObject(this, "Debug Menu", 800, 650, DisplayAnchor.CENTER);
-
-        //menuPrefab.initialize();
 
         gameEngine.getEventManager().registerEventHandlers(this);
     }
@@ -35,15 +31,15 @@ public class Canvas {
         canvasObjects.put(object.getGameObjectName(), object);
     }
 
-    public TextView createTextView(String name, String text, DisplayAnchor anchor, AlignmentData... alignmentData){
-        return createTextView(name, text, TextFont.IMPACT, anchor, alignmentData);
+    public TextView instantiateText(String name, String text, DisplayAnchor anchor, AlignmentData... alignmentData){
+        return instantiateText(name, text, TextFont.IMPACT, anchor, alignmentData);
     }
 
-    public TextView createTextView(String name, String text, DisplayAnchor anchor){
-       return createTextView(name, text, TextFont.IMPACT, anchor);
+    public TextView instantiateText(String name, String text, DisplayAnchor anchor){
+       return instantiateText(name, text, TextFont.IMPACT, anchor);
     }
 
-    public TextView createTextView(String name, String text, TextFont font, DisplayAnchor anchor, AlignmentData... alignmentData){
+    public TextView instantiateText(String name, String text, TextFont font, DisplayAnchor anchor, AlignmentData... alignmentData){
         TextView textView = new TextView(getGameEngine(), text, font, name);
 
         textView.setDisplayAnchor(anchor);
@@ -57,7 +53,7 @@ public class Canvas {
         return textView;
     }
 
-    public BoxView createBoxView(String name, Color color, DisplayAnchor displayAnchor, int xSize, int ySize){
+    public BoxView instantiateBox(String name, Color color, DisplayAnchor displayAnchor, int xSize, int ySize){
         BoxView boxView = new BoxView(getGameEngine(), name, xSize, ySize);
         boxView.setDisplayAnchor(displayAnchor);
         boxView.setColor(color);
@@ -72,7 +68,5 @@ public class Canvas {
         for(HudObject hudObject : canvasObjects.values()){
             hudObject.update();
         }
-
-        //((TextView) getCanvasObjects().get("Test Text")).setText("Data Text");
     }
 }

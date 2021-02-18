@@ -9,7 +9,7 @@ import java.util.List;
 
 public class GamePalette {
 
-    @Getter private static final List<Color> grassColors = new LinkedList<Color>(Arrays.asList(new Color(130.0f, 170.0f, 50.0f, 255.0f),
-                                                                                    new Color(100.0f, 145.0f, 40.0f, 255.0f),
-                                                                                    new Color(125.0f, 175.0f, 60.0f, 255.0f)));
+    @Getter private static final List<Color> grassColors = new LinkedList<Color>(Arrays.asList(new Color(255.0f, 255.0f, 255.0f, 255.0f),
+                                                                                    new Color(239.0f, 250.0f, 255.0f, 255.0f),
+                                                                                    new Color(225.0f, 245.0f, 246.0f, 255.0f)));
 }

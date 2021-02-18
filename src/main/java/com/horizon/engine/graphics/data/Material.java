@@ -1,8 +1,8 @@
 package com.horizon.engine.graphics.data;
 
 import com.horizon.engine.common.Color;
+import com.horizon.engine.graphics.texture.Texture;
 import lombok.Data;
-import org.joml.Vector4f;
 
 public @Data class Material {
 

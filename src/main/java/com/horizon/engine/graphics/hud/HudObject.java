@@ -1,6 +1,7 @@
 package com.horizon.engine.graphics.hud;
 
 import com.horizon.engine.GameEngine;
+import com.horizon.engine.component.component.mesh.DisplayMesh;
 import com.horizon.engine.graphics.object.GameObject;
 import com.horizon.engine.graphics.hud.orientations.AlignmentData;
 import com.horizon.engine.graphics.hud.orientations.AlignmentPercentage;
@@ -8,6 +9,7 @@ import com.horizon.engine.graphics.hud.orientations.AlignmentSize;
 import com.horizon.engine.graphics.hud.other.DisplayAnchor;
 import com.horizon.engine.graphics.hud.text.TextView;
 import lombok.Getter;
+import lombok.Setter;
 import org.joml.Vector2f;
 
 import java.util.LinkedList;
@@ -30,8 +32,9 @@ import java.util.List;
 public abstract class HudObject extends GameObject {
 
     @Getter private DisplayAnchor displayAnchor;
-
     @Getter private final List<AlignmentData> alignmentDataList;
+
+    @Getter @Setter private DisplayMesh displayMesh;
 
     @Getter private HudObject parentObject = null;
 

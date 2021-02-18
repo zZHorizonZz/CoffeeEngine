@@ -49,13 +49,13 @@ public abstract class MenuObject {
     }
 
     public void initialize(){
-        menuContainer = getCanvas().createBoxView(name + " Container", ApplicationData.getMainBackground(), getDisplayAnchor(), (int) getXSize(), (int) getYSize());
-        topMenuContainer = getCanvas().createBoxView(name + " Top Container", ApplicationData.getSubBackground(), DisplayAnchor.TOP, (int) getXSize(), 40);
+        menuContainer = getCanvas().instantiateBox(name + " Container", ApplicationData.getMainBackground(), getDisplayAnchor(), (int) getXSize(), (int) getYSize());
+        topMenuContainer = getCanvas().instantiateBox(name + " Top Container", ApplicationData.getSubBackground(), DisplayAnchor.TOP, (int) getXSize(), 40);
         topMenuContainer.setParent(menuContainer);
 
         topMenuContainer.addAlignmentData(new AlignmentSize(topMenuContainer, 100, 0));
 
-        menuHeader = getCanvas().createTextView(name + " Header", name, TextFont.MODERN_SANS, DisplayAnchor.LEFT);
+        menuHeader = getCanvas().instantiateText(name + " Header", name, TextFont.MODERN_SANS, DisplayAnchor.LEFT);
         menuHeader.setSize(25);
         menuHeader.setBold(true);
         menuHeader.addAlignmentData(new AlignmentDistance(menuHeader, menuHeader.getWidth() / 2 + 25, 0));

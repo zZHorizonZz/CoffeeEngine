@@ -1,7 +1,7 @@
 package com.horizon.engine.common;
 
-import com.horizon.engine.component.component.Mesh;
-import com.horizon.engine.graphics.data.MeshData;
+import com.horizon.engine.asset.prefab.data.MeshData;
+import com.horizon.engine.component.component.mesh.Mesh;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
@@ -63,10 +63,10 @@ public class UtilModelLoader {
                         break;
                 }
             }
-            MeshData meshData = reorderLists(vertices, textures, normals, faces);
-            meshData.setName(name);
+            MeshData mesh = reorderLists(vertices, textures, normals, faces);
+            mesh.setName(name);
 
-            return meshData;
+            return mesh;
         }catch (Exception exception){
             exception.printStackTrace();
             return null;
@@ -99,8 +99,7 @@ public class UtilModelLoader {
         }
         int[] indicesArr = new int[indices.size()];
         indicesArr = indices.stream().mapToInt((Integer v) -> v).toArray();
-        MeshData mesh = new MeshData(posArr, textCoordArr, normArr, indicesArr);
-        return mesh;
+        return new MeshData(posArr, textCoordArr, normArr, indicesArr);
     }
 
     private static void processFaceVertex(IdxGroup indices, List<Vector2f> textCoordList,

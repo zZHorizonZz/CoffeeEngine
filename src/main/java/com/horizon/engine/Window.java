@@ -1,6 +1,8 @@
 package com.horizon.engine;
 
 import com.horizon.engine.common.Color;
+import com.horizon.engine.data.ApplicationData;
+import lombok.Data;
 import lombok.Getter;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
@@ -17,19 +19,19 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
-public class Window {
+public @Data class Window {
 
-    private static final float FOV = (float) Math.toRadians(60.0f);
-    private static final float Z_NEAR = 0.01f;
-    private static final float Z_FAR = 1000.f;
-
-    @Getter private final GameEngine gameEngine;
-    @Getter private final String title;
+    @Getter private static final float FOV = (float) Math.toRadians(60.0f);
+    @Getter private static final float Z_NEAR = 0.01f;
+    @Getter private static final float Z_FAR = 1000.f;
 
     @Getter private static int width;
     @Getter private static int height;
 
-    @Getter private long windowHandle;
+    private final GameEngine gameEngine;
+    private final String title;
+
+    private long windowHandle;
 
     private boolean resized;
     private boolean vSync;
@@ -60,8 +62,20 @@ public class Window {
         glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+        if (ApplicationData.isCompatibleProfile()) {
+            glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
+        } else {
+            glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+            glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+        }
+
+        boolean maximized = false;
+        if (width == 0 || height == 0) {
+            width = 100;
+            height = 100;
+            glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
+            maximized = true;
+        }
 
         windowHandle = glfwCreateWindow(width, height, title, NULL, NULL);
         if (windowHandle == NULL) {
@@ -74,12 +88,15 @@ public class Window {
             this.setResized(true);
         });
 
-        GLFWVidMode videoMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-        if(videoMode == null){
-            throw new RuntimeException("Failed to recognize video mode.");
+        if (maximized) {
+            // Maximize window
+            glfwMaximizeWindow(windowHandle);
+        } else {
+            // Get the resolution of the primary monitor
+            GLFWVidMode videoMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+            // Center window
+            glfwSetWindowPos(windowHandle, (videoMode.width() - width) / 2, (videoMode.height() - height) / 2);
         }
-
-        glfwSetWindowPos(windowHandle, (videoMode.width() - width) / 2, (videoMode.height() - height) / 2);
 
         glfwMakeContextCurrent(windowHandle);
 
@@ -89,7 +106,6 @@ public class Window {
 
         glfwShowWindow(windowHandle);
         enableCapabilities();
-        //enableLEGUI();
     }
 
     private void enableCapabilities(){
@@ -103,8 +119,15 @@ public class Window {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         //glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_BACK);
+        if (ApplicationData.isBackFaceCulling()) {
+            glEnable(GL_CULL_FACE);
+            glCullFace(GL_BACK);
+        }
+
+        // Antialiasing
+        if (ApplicationData.isAntialiasing()) {
+            glfwWindowHint(GLFW_SAMPLES, 4);
+        }
     }
 
     public void setClearColor(Color color) {
@@ -121,8 +144,13 @@ public class Window {
     }
 
     public Matrix4f updateProjectionMatrix() {
-        float aspectRatio = (float)width / (float)height;
+        float aspectRatio = (float) width / (float) height;
         return projectionMatrix.setPerspective(FOV, aspectRatio, Z_NEAR, Z_FAR);
+    }
+
+    public static Matrix4f updateProjectionMatrix(Matrix4f matrix, int width, int height) {
+        float aspectRatio = (float) width / (float) height;
+        return matrix.setPerspective(FOV, aspectRatio, Z_NEAR, Z_FAR);
     }
 
     public boolean isKeyPressed(int keyCode) {

@@ -20,7 +20,7 @@ public class DeveloperMenu extends MenuObject {
     }
 
     public void initializeLabel() {
-        dataLabel = getCanvas().createTextView("Application Data", getDeveloperData(), TextFont.MODERN_SANS, DisplayAnchor.LEFT);
+        dataLabel = getCanvas().instantiateText("Application Data", getDeveloperData(), TextFont.MODERN_SANS, DisplayAnchor.LEFT);
 
         dataLabel.getTextComponent().setSpaceBetweenLines(1.0f);
         dataLabel.setBold(false);

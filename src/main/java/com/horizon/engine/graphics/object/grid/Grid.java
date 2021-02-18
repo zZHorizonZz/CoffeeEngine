@@ -1,9 +1,9 @@
 package com.horizon.engine.graphics.object.grid;
 
 import com.horizon.engine.GameEngine;
-import com.horizon.engine.graphics.data.Texture;
+import com.horizon.engine.graphics.texture.Texture;
 import com.horizon.engine.graphics.object.GameObject;
-import com.horizon.engine.component.component.Mesh;
+import com.horizon.engine.component.component.mesh.Mesh;
 import lombok.Getter;
 
 import java.util.LinkedList;

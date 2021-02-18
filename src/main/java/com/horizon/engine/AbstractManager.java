@@ -4,11 +4,8 @@ import lombok.Getter;
 
 public abstract class AbstractManager {
 
-    @Getter
-    private final String managerName;
-
-    @Getter
-    private final GameEngine gameEngine;
+    @Getter private final String managerName;
+    @Getter private final GameEngine gameEngine;
 
     public AbstractManager(GameEngine engine, String managerName){
         this.gameEngine = engine;

@@ -1,11 +1,17 @@
 package com.horizon.engine.common;
 
+import org.lwjgl.system.MemoryUtil;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.nio.FloatBuffer;
+import java.util.*;
+
+import static org.lwjgl.opengl.GL11.GL_FLOAT;
+import static org.lwjgl.opengl.GL15.*;
+import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
+import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 
 public class UtilResource {
 
@@ -36,5 +42,23 @@ public class UtilResource {
             floatArr[i] = list.get(i);
         }
         return floatArr;
+    }
+
+    public static Map.Entry<Integer, FloatBuffer> createResourceBuffers(List<Integer> vboList, float[] bufferData, int index, int size, int drawType) {
+        // Generate vboid
+        int vboId = glGenBuffers();
+        vboList.add(vboId);
+
+        // Create float buffer.
+        FloatBuffer buffer = MemoryUtil.memAllocFloat(bufferData.length);
+        buffer.put(bufferData).flip();
+
+        // Bind buffer.
+        glBindBuffer(GL_ARRAY_BUFFER, vboId);
+        glBufferData(GL_ARRAY_BUFFER, buffer, drawType);
+        glEnableVertexAttribArray(index);
+        glVertexAttribPointer(index, size, GL_FLOAT, false, 0, 0);
+
+        return new AbstractMap.SimpleEntry<Integer, FloatBuffer>(vboId, buffer);
     }
 }

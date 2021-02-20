@@ -36,7 +36,7 @@ public class DummyGame extends AbstractGameLogic {
     }
 
     @Override
-    public void initialize() throws Exception {
+    public void onEnable() throws Exception {
         renderer.initialize(getGameEngine().getWindow());
 
         setScene(new Scene(getGameEngine()));
@@ -70,6 +70,11 @@ public class DummyGame extends AbstractGameLogic {
     }
 
     @Override
+    public void onDisable() {
+
+    }
+
+    @Override
     public void onInput(Window window, MouseInput mouseInput) {
         getControllerManager().onCameraMovement(window);
     }
@@ -90,17 +95,5 @@ public class DummyGame extends AbstractGameLogic {
             return;
 
         renderer.render(window, camera, getScene(), getCanvas());
-    }
-
-    @Override
-    public void cleanup() {
-        renderer.cleanup();
-        for (GameObject gameObject : getScene().getSceneObjects().values()) {
-            if(!gameObject.getComponents().containsKey(ComponentType.MESH))
-                continue;
-
-            gameObject.getMesh().cleanUp();
-            gameObject.getMesh().cleanUpTexture();
-        }
     }
 }

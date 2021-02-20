@@ -53,8 +53,8 @@ public @Data class Raycast {
 
             min.set(gameObject.getPosition());
             max.set(gameObject.getPosition());
-            min.add(-gameObject.getScale().x(), -gameObject.getScale().y(), -gameObject.getScale().z());
-            max.add(gameObject.getScale().x(), gameObject.getScale().y(), gameObject.getScale().z());
+            min.add(-gameObject.getTransform().getScale().x(), -gameObject.getTransform().getScale().y(), -gameObject.getTransform().getScale().z());
+            max.add(gameObject.getTransform().getScale().x(), gameObject.getTransform().getScale().y(), gameObject.getTransform().getScale().z());
             if (Intersectionf.intersectRayAab(center, dir, min, max, nearFar) && nearFar.x < closestDistance) {
                 closestDistance = nearFar.x;
                 selectedGameObject = gameObject;

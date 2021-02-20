@@ -4,6 +4,7 @@ import com.horizon.engine.AbstractGameLogic;
 import com.horizon.engine.AbstractManager;
 import com.horizon.engine.GameEngine;
 import com.horizon.engine.Window;
+import com.horizon.engine.data.ApplicationData;
 import com.horizon.engine.event.event.MouseClickEvent;
 import com.horizon.engine.graphics.object.Camera;
 import com.horizon.engine.input.other.InputHandler;
@@ -23,9 +24,11 @@ public class ControllerManager extends AbstractManager {
 
     @Getter private Camera camera;
 
-    protected Vector3f cameraMovement;
+    @Getter private final Vector3f panMovement;
+    @Getter private final Vector3f cameraOrigin;
+    @Getter private float panSpeed;
+
     private static final float MOUSE_SENSITIVITY = 0.2f;
-    private static final float CAMERA_POS_STEP = 0.05f;
 
     // Testing
     private float lightAngle = 0.0f;
@@ -35,7 +38,8 @@ public class ControllerManager extends AbstractManager {
         super(gameEngine, "Controller Manager");
 
         game = gameEngine.getGameLogic();
-        cameraMovement = new Vector3f(0, 0, 0);
+        panMovement = new Vector3f(0, 0, 0);
+        cameraOrigin = new Vector3f(0, 0, 0);
     }
 
     @Override
@@ -46,24 +50,23 @@ public class ControllerManager extends AbstractManager {
     @Override
     public void initialize() {
         camera = game.getScene().getSceneCamera();
+        camera.setPosition(0, 25, 0);
+
+        panSpeed = ApplicationData.getPanSpeed();
     }
 
+    //TODO: This can be added to tool manager for developer mode.
     public void onCameraMovement(Window window) {
-        cameraMovement.set(0, 0, 0);
+        panMovement.zero();
         if (window.isKeyPressed(GLFW.GLFW_KEY_W)) {
-            cameraMovement.z = -1;
+            panMovement.z = -1 * panSpeed * getGameEngine().getTimer().getDeltaTime();
         } else if (window.isKeyPressed(GLFW.GLFW_KEY_S)) {
-            cameraMovement.z = 1;
+            panMovement.z = 1 * panSpeed * getGameEngine().getTimer().getDeltaTime();
         }
         if (window.isKeyPressed(GLFW.GLFW_KEY_A)) {
-            cameraMovement.x = -1;
+            panMovement.x = -1 * panSpeed * getGameEngine().getTimer().getDeltaTime();
         } else if (window.isKeyPressed(GLFW.GLFW_KEY_D)) {
-            cameraMovement.x = 1;
-        }
-        if (window.isKeyPressed(GLFW.GLFW_KEY_Z)) {
-            cameraMovement.y = -1;
-        } else if (window.isKeyPressed(GLFW.GLFW_KEY_X)) {
-            cameraMovement.y = 1;
+            panMovement.x = 1 * panSpeed * getGameEngine().getTimer().getDeltaTime();
         }
 
         // Testing
@@ -105,7 +108,7 @@ public class ControllerManager extends AbstractManager {
         if (camera == null)
             return;
 
-        camera.movePosition(cameraMovement.x * CAMERA_POS_STEP, cameraMovement.y * CAMERA_POS_STEP, cameraMovement.z * CAMERA_POS_STEP);
+        camera.movePosition(panMovement.x, panMovement.y, panMovement.z);
 
         if (mouseInput.isLeftButtonPressed()) {
             getGameEngine().getEventManager().callEvent(new MouseClickEvent(GLFW_MOUSE_BUTTON_1));

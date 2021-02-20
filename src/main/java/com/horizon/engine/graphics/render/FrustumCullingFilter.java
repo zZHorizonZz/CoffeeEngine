@@ -37,7 +37,7 @@ public class FrustumCullingFilter {
             GameObject gameObject = entry.getValue().getValue();
 
             if (!gameObject.isDisableFrustumCulling()) {
-                float gameObjectScale = Math.max(gameObject.getScale().x(), Math.max(gameObject.getScale().y(), gameObject.getScale().z()));
+                float gameObjectScale = Math.max(gameObject.getTransform().getScaleX(), Math.max(gameObject.getTransform().getScaleY(), gameObject.getTransform().getScaleZ()));
                 boundingRadius = gameObjectScale * mesh.getBoundingRadius();
                 position = gameObject.getPosition();
                 gameObject.setInsideFrustum(insideFrustum(position.x(), position.y(), position.z(), boundingRadius));
@@ -57,7 +57,7 @@ public class FrustumCullingFilter {
         Vector3f position;
         for (GameObject gameObject : gameObjects) {
             if (!gameObject.isDisableFrustumCulling()) {
-                float gameObjectScale = Math.max(gameObject.getScale().x(), Math.max(gameObject.getScale().y(), gameObject.getScale().z()));
+                float gameObjectScale = Math.max(gameObject.getTransform().getScaleX(), Math.max(gameObject.getTransform().getScaleY(), gameObject.getTransform().getScaleZ()));
                 boundingRadius = gameObjectScale * meshBoundingRadius;
                 position = gameObject.getPosition();
                 gameObject.setInsideFrustum(insideFrustum(position.x(), position.y(), position.z(), boundingRadius));

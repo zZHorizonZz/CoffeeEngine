@@ -5,17 +5,18 @@ import com.horizon.engine.common.UtilResource;
 import com.horizon.engine.component.Component;
 import com.horizon.engine.component.ComponentType;
 import com.horizon.engine.graphics.data.Material;
-import com.horizon.engine.graphics.texture.Texture;
-import com.horizon.engine.graphics.data.Vertex;
 import com.horizon.engine.graphics.object.GameObject;
+import com.horizon.engine.graphics.texture.Texture;
 import lombok.Getter;
 import lombok.Setter;
 import org.lwjgl.system.MemoryUtil;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.util.*;
-import java.util.Map.Entry;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -25,9 +26,7 @@ import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
 
-public class Mesh extends Component {
-
-    public static final int MAX_WEIGHTS = 4;
+public class TerrainMesh extends Component {
 
     @Getter @Setter private String name;
 
@@ -41,125 +40,40 @@ public class Mesh extends Component {
     @Getter @Setter private boolean visible = false;
 
     @Getter private float[] positions;
-    @Getter private float[] textureCoordinates;
+    @Getter private float[] colors;
     @Getter private float[] normals;
-    @Getter private float[] weights;
     @Getter private int[] indices;
-    @Getter private int[] jointIndices;
 
     @Getter private FloatBuffer positionBuffer;
-    @Getter private FloatBuffer textureCoordinatesBuffer;
+    @Getter private FloatBuffer colorsBuffer;
     @Getter private FloatBuffer normalsBuffer;
     @Getter private IntBuffer indicesBuffer;
-    @Getter private IntBuffer jointIndicesBuffer;
-    @Getter private FloatBuffer weightsBuffer;
 
     protected int positionVboId;
-    protected int textureVboId;
+    protected int colorsVboId;
     protected int normalsVboId;
     protected int indicesVboId;
-    protected int jointIndicesVboId;
-    protected int weightVboId;
 
-    @Getter @Setter private float boundingRadius = 1.0f;
-
-    public Mesh(){
-        super(ComponentType.MESH);
-    }
-
-    public Mesh(float[] positions) {
-        super(ComponentType.MESH);
-
-        this.positions = positions;
-
-        render(positions);
-    }
-
-    public Mesh(float[] positions, float[] textureCoordinates, float[] normals, int[] indices) {
-        this(positions, textureCoordinates, normals, indices, Mesh.createEmptyIntArray(Mesh.MAX_WEIGHTS * positions.length / 3, 0), Mesh.createEmptyFloatArray(Mesh.MAX_WEIGHTS * positions.length / 3, 0));
-    }
-
-    public Mesh(float[] positions, float[] textureCoordinates, float[] normals, int[] indices, int[] jointIndices, float[] weights) {
+    public TerrainMesh(float[] positions, float[] colors, float[] normals, int[] indices) {
         super(ComponentType.MESH);
 
         this.positions = positions.clone();
-        this.textureCoordinates = textureCoordinates.clone();
-        this.normals = normals.clone();
-        this.weights = weights.clone();
-        this.indices = indices.clone();
-        this.jointIndices = jointIndices.clone();
-
-        render(positions, textureCoordinates, normals, indices, jointIndices, weights);
-    }
-
-    public Mesh(List<Vertex> vertexes, float[] textureCoordinates, float[] normals, int[] indices, int[] jointIndices, float[] weights) {
-        super(ComponentType.MESH);
-        float[] positions = UtilModel.vertexToArray(vertexes);
-
-        this.positions = positions.clone();
-        this.textureCoordinates = textureCoordinates.clone();
+        this.colors = colors.clone();
         this.normals = normals.clone();
         this.indices = indices.clone();
-        this.indices = indices.clone();
-        this.jointIndices = jointIndices.clone();
 
-        render(positions, textureCoordinates, normals, indices, jointIndices, weights);
+        render(this.positions, this.colors, this.normals, this.indices);
     }
 
     @Override
     public void update() {
-        if(textureVboId == 0) {
-            // This is used for hud rendering.
-            glBindVertexArray(getVaoId());
-            glEnableVertexAttribArray(0);
 
-            glDrawArrays(GL_TRIANGLE_STRIP, 0, getVertexCount());
-
-            glDisableVertexAttribArray(0);
-            glBindVertexArray(0);
-        } else {
-            // This is used for mesh rendering.
-            start();
-
-            glEnableVertexAttribArray(0);
-            glEnableVertexAttribArray(1);
-            glEnableVertexAttribArray(2);
-
-            glDrawElements(GL_TRIANGLES, getVertexCount(), GL_UNSIGNED_INT, 0);
-            glBindVertexArray(0);
-            glBindTexture(GL_TEXTURE_2D, 0);
-        }
     }
 
-    private void render(float[] positions){
+    private void render(float[] positions, float[] colors, float[] normals, int[] indices) {
         FloatBuffer positionsBuffer = null;
-
-        try {
-            vertexCount = positions.length / 2;
-            vboIdList = new LinkedList<>();
-            vaoId = glGenVertexArrays();
-
-            glBindVertexArray(vaoId);
-
-            Entry<Integer, FloatBuffer> pair = UtilResource.createResourceBuffers(vboIdList, positions, 0, 2, GL_DYNAMIC_DRAW);
-            positionVboId = pair.getKey();
-            positionsBuffer = pair.getValue();
-
-            glBindVertexArray(0);
-        } finally {
-            if (positionsBuffer != null) {
-                this.positionBuffer = positionsBuffer;
-                MemoryUtil.memFree(positionsBuffer);
-            }
-        }
-    }
-
-    private void render(float[] positions, float[] textureCoordinates, float[] normals, int[] indices, int[] jointIndices, float[] weights) {
-        FloatBuffer positionsBuffer = null;
-        FloatBuffer textureCoordinatesBuffer = null;
+        FloatBuffer colorsBuffer = null;
         FloatBuffer normalsBuffer = null;
-        FloatBuffer weightsBuffer = null;
-        IntBuffer jointIndicesBuffer = null;
         IntBuffer indicesBuffer = null;
 
         try {
@@ -171,16 +85,16 @@ public class Mesh extends Component {
 
             // Create positions buffer.
             if (positions != null) {
-                Entry<Integer, FloatBuffer> pair = UtilResource.createResourceBuffers(vboIdList, positions, 0, 3, GL_DYNAMIC_DRAW);
+                Map.Entry<Integer, FloatBuffer> pair = UtilResource.createResourceBuffers(vboIdList, positions, 0, 3, GL_DYNAMIC_DRAW);
                 positionVboId = pair.getKey();
                 positionsBuffer = pair.getValue();
             }
 
             // Create texture buffer.
-            if (textureCoordinates != null) {
-                Entry<Integer, FloatBuffer> pair = UtilResource.createResourceBuffers(vboIdList, textureCoordinates, 1, 2, GL_STATIC_DRAW);
-                textureVboId = pair.getKey();
-                textureCoordinatesBuffer = pair.getValue();
+            if (colors != null) {
+                Map.Entry<Integer, FloatBuffer> pair = UtilResource.createResourceBuffers(vboIdList, colors, 1, 4, GL_STATIC_DRAW);
+                colorsVboId = pair.getKey();
+                colorsBuffer = pair.getValue();
             }
 
             // Create normals buffer.
@@ -197,26 +111,7 @@ public class Mesh extends Component {
                 glBindBuffer(GL_ARRAY_BUFFER, normalsVboId);
                 glBufferData(GL_ARRAY_BUFFER, normalsBuffer, GL_STATIC_DRAW);
                 glEnableVertexAttribArray(2);
-                glVertexAttribPointer(2, 3, GL_FLOAT, false, 0, 0);
-            }
-
-            // Create weights buffer
-            if (weights != null) {
-                Entry<Integer, FloatBuffer> pair = UtilResource.createResourceBuffers(vboIdList, weights, 3, 4, GL_STATIC_DRAW);
-                weightVboId = pair.getKey();
-                weightsBuffer = pair.getValue();
-            }
-
-            // Create joint indices buffer
-            if(jointIndices != null) {
-                jointIndicesVboId = glGenBuffers();
-                vboIdList.add(jointIndicesVboId);
-                jointIndicesBuffer = MemoryUtil.memAllocInt(jointIndices.length);
-                jointIndicesBuffer.put(jointIndices).flip();
-                glBindBuffer(GL_ARRAY_BUFFER, jointIndicesVboId);
-                glBufferData(GL_ARRAY_BUFFER, jointIndicesBuffer, GL_STATIC_DRAW);
-                glEnableVertexAttribArray(4);
-                glVertexAttribPointer(4, 4, GL_FLOAT, false, 0, 0);
+                glVertexAttribPointer(2, 4, GL_FLOAT, false, 0, 0);
             }
 
             //Create indices buffer.
@@ -234,25 +129,17 @@ public class Mesh extends Component {
                 this.positionBuffer = positionsBuffer;
                 MemoryUtil.memFree(positionsBuffer);
             }
-            if (textureCoordinatesBuffer != null) {
-                this.textureCoordinatesBuffer = textureCoordinatesBuffer;
-                MemoryUtil.memFree(textureCoordinatesBuffer);
+            if (colorsBuffer != null) {
+                this.colorsBuffer = colorsBuffer;
+                MemoryUtil.memFree(colorsBuffer);
             }
             if (normalsBuffer != null) {
                 this.normalsBuffer = normalsBuffer;
                 MemoryUtil.memFree(normalsBuffer);
             }
-            if (weightsBuffer != null) {
-                this.weightsBuffer = weightsBuffer;
-                MemoryUtil.memFree(weightsBuffer);
-            }
             if (indicesBuffer != null) {
                 this.indicesBuffer = indicesBuffer;
                 MemoryUtil.memFree(indicesBuffer);
-            }
-            if (jointIndicesBuffer != null) {
-                this.jointIndicesBuffer = jointIndicesBuffer;
-                MemoryUtil.memFree(jointIndicesBuffer);
             }
         }
     }

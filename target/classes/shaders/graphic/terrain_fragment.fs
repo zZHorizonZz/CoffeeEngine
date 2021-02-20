@@ -1,6 +1,6 @@
 #version 330
 
-in vec3 pass_colour;
+flat in vec3 pass_colour;
 
 out vec4 out_colour;
 

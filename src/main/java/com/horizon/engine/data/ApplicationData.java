@@ -20,6 +20,9 @@ public class ApplicationData {
     @Getter @Setter private static boolean frustumCulling = true;
     @Getter @Setter private static boolean antialiasing = true;
 
+    //Camera settings
+    @Getter @Setter private static float panSpeed = 50.0f;
+
     //System Stuff
     @Getter @Setter private static Random random = new Random();
     @Getter @Setter private static boolean showFPS = true;

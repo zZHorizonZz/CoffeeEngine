@@ -45,7 +45,7 @@ public @Data class PerlinNoise {
         for(int i = 0; i < octaves; i++) {
             float frequency = (float) (Math.pow(2, i) / d);
             float heightAmplitude = (float) Math.pow(roughness, i) * amplitude;
-            height += getInterpolatedNoise((x) * frequency, (z) * frequency) * heightAmplitude;
+            height += getInterpolatedNoise((float) ((x / 1.5) * frequency), (float) ((z / 1.5) * frequency)) * heightAmplitude;
         }
 
         return height;
@@ -83,5 +83,23 @@ public @Data class PerlinNoise {
     private float getNoise(int x, int z) {
         random.setSeed(x * 91348 + z * 56465 + seed);
         return random.nextFloat() * 2f - 1f;
+    }
+
+    /**
+     * Uses the perlin noise generator (which might actually not be using the
+     * Perlin Noise algorithm - I'm not quite sure if it is or isn't) to
+     * generate heights for all of the terrain's vertices.
+     *
+     * @param gridSize - The number of grid squares along one edge of the terrain.
+     * @return All the heights for the vertices.
+     */
+    public float[][] generateHeights(int gridSize) {
+        float[][] heights = new float[gridSize + 1][gridSize + 1];
+        for (int z = 0; z < heights.length; z++) {
+            for (int x = 0; x < heights[z].length; x++) {
+                heights[z][x] = getHeight(x, z);
+            }
+        }
+        return heights;
     }
 }

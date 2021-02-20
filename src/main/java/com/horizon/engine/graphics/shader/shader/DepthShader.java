@@ -75,9 +75,6 @@ public class DepthShader extends MeshShader {
             // Start the shader program.
             start();
 
-            DirectionalLight light = scene.getSceneLight().getDirectionalLight();
-            DirectionalLightComponent directionalLightComponent = light.getDirectionalLight();
-
             // Render scene for each cascade map
             for (int i = 0; i < NUM_CASCADES; i++) {
                 ShadowCascade shadowCascade = shadowCascades.get(i);

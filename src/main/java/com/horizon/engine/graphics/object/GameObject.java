@@ -5,6 +5,7 @@ import com.horizon.engine.common.UtilModel;
 import com.horizon.engine.component.Component;
 import com.horizon.engine.component.ComponentType;
 import com.horizon.engine.component.component.mesh.Mesh;
+import com.horizon.engine.graphics.data.Transform;
 import com.horizon.engine.graphics.object.data.GameObjectTag;
 import lombok.Data;
 import org.joml.Quaternionf;
@@ -18,19 +19,12 @@ import java.util.Map;
 public @Data abstract class GameObject {
 
     private final GameEngine gameEngine;
+    private Transform transform;
 
     private String gameObjectName;
 
     private Map<ComponentType, Component> components = new LinkedHashMap<ComponentType, Component>();
     private List<GameObjectTag> gameObjectTags = new LinkedList<>();
-
-    private final Vector3f scale;
-    private final Vector3f position;
-    private final Quaternionf rotation;
-
-    private float xAngle;
-    private float yAngle;
-    private float zAngle;
 
     private boolean selected;
 
@@ -42,24 +36,20 @@ public @Data abstract class GameObject {
     public GameObject(GameEngine gameEngine, String gameObjectName, Mesh mesh) {
         this.gameEngine = gameEngine;
         this.gameObjectName = gameObjectName;
+        this.transform = new Transform();
         addComponent(mesh);
-        position = new Vector3f();
-        scale = new Vector3f(1, 1, 1);
-        rotation = new Quaternionf();
     }
 
     public GameObject(GameEngine gameEngine, String gameObjectName) {
         this.gameEngine = gameEngine;
         this.gameObjectName = gameObjectName;
-        position = new Vector3f();
-        scale = new Vector3f(1, 1, 1);
-        rotation = new Quaternionf();
+        this.transform = new Transform();
     }
 
     public abstract void update();
 
     public Vector3f getPosition() {
-        return position;
+        return transform.getPosition();
     }
 
     public float getX(){
@@ -74,16 +64,21 @@ public @Data abstract class GameObject {
         return getPosition().z();
     }
 
-    public GameObject setPosition(float x, float y, float z) {
-        this.position.x = x;
-        this.position.y = y;
-        this.position.z = z;
+    public GameObject setPosition(Vector3f position) {
+        return setPosition(position.x(), position.y(), position.z());
+    }
 
+    public GameObject setPosition(float x, float y, float z) {
+        this.transform.getPosition().set(x, y, z);
         return this;
     }
 
+    public GameObject setScale(Vector3f scale) {
+        return setScale(scale.x(), scale.y(), scale.z());
+    }
+
     public GameObject setScale(float x, float y, float z) {
-        scale.set(x, y, z);
+        this.transform.getScale().set(x, y, z);
 
         if(!getComponents().containsKey(ComponentType.MESH))
             return this;
@@ -94,22 +89,13 @@ public @Data abstract class GameObject {
         return this;
     }
 
-    public GameObject setRotation(float x, float y, float z) {
-        this.xAngle = x;
-        this.yAngle = y;
-        this.zAngle = z;
-
-        getRotation().rotateXYZ((float) Math.toRadians(x), (float) Math.toRadians(y), (float) Math.toRadians(z));
-
+    public GameObject setRotation(Quaternionf q) {
+        this.transform.getRotation().set(q);
         return this;
     }
 
-    public Quaternionf getRotation() {
-        return rotation;
-    }
-
-    public GameObject setRotation(Quaternionf q) {
-        this.rotation.set(q);
+    public GameObject setRotation(float x, float y, float z) {
+        this.transform.getRotation().rotateXYZ((float) Math.toRadians(x), (float) Math.toRadians(y), (float) Math.toRadians(z));
         return this;
     }
 

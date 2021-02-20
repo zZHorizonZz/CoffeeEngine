@@ -11,12 +11,14 @@ import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWFramebufferSizeCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
+import org.lwjgl.opengl.GL32;
 import org.lwjgl.system.MemoryUtil;
 
 import java.nio.IntBuffer;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL32.glProvokingVertex;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public @Data class Window {
@@ -54,7 +56,7 @@ public @Data class Window {
         GLFWErrorCallback.createPrint(System.err).set();
 
         if (!glfwInit()) {
-            throw new IllegalStateException("Unable to initialize GLFW.");
+            throw new IllegalStateException("Unable to onEnable GLFW.");
         }
 
         glfwDefaultWindowHints();
@@ -114,6 +116,8 @@ public @Data class Window {
         glClearColor(0.2f, 0.5f, 0.65f, 1.0f);
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_STENCIL_TEST);
+
+        glProvokingVertex(GL32.GL_FIRST_VERTEX_CONVENTION);
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

@@ -29,9 +29,6 @@ public class BuildingManager extends AbstractManager {
     private Building selectedBuilding;
     private MapSquare currentSquare;
 
-    //Testing
-    @Getter private Terrain terrain;
-
     public BuildingManager(KingdomBuilder game) {
         super(game.getGameEngine(), "Building Manager");
 
@@ -48,8 +45,7 @@ public class BuildingManager extends AbstractManager {
 
     @Override
     public void initialize() {
-        terrain = new Terrain(getGameEngine(), "Terrain", 30, 30);
-        getGameEngine().getScene().instantiate(terrain);
+
     }
 
     @EventHandler

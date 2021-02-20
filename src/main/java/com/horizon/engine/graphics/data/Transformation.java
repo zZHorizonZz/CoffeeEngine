@@ -12,7 +12,6 @@ public class Transformation {
     private final Matrix4f modelMatrix;
     private final Matrix4f modelViewMatrix;
     private final Matrix4f modelLightViewMatrix;
-    private final Matrix4f lightViewMatrix;
     private final Matrix4f orthographicProjectionMatrix;
     private final Matrix4f ortho2DMatrix;
     private final Matrix4f orthoModelMatrix;
@@ -25,7 +24,6 @@ public class Transformation {
         orthographicProjectionMatrix = new Matrix4f();
         ortho2DMatrix = new Matrix4f();
         orthoModelMatrix = new Matrix4f();
-        lightViewMatrix = new Matrix4f();
     }
 
     public final Matrix4f getOrthographicProjectionMatrix() {
@@ -34,18 +32,6 @@ public class Transformation {
 
     public Matrix4f updateOrthographicProjectionMatrix(float left, float right, float bottom, float top, float zNear, float zFar) {
         return orthographicProjectionMatrix.setOrtho(left, right, bottom, top, zNear, zFar);
-    }
-
-    public Matrix4f getLightViewMatrix() {
-        return lightViewMatrix;
-    }
-
-    public void setLightViewMatrix(Matrix4f lightViewMatrix) {
-        this.lightViewMatrix.set(lightViewMatrix);
-    }
-
-    public Matrix4f updateLightViewMatrix(Vector3f position, Vector3f rotation) {
-        return updateGenericViewMatrix(position, rotation, lightViewMatrix);
     }
 
     public static  Matrix4f updateGenericViewMatrix(Vector3f position, Vector3f rotation, Matrix4f matrix) {
@@ -58,12 +44,11 @@ public class Transformation {
         return ortho2DMatrix.setOrtho2D(left, right, bottom, top);
     }
 
-    public Matrix4f buildModelMatrix(GameObject gameItem) {
-        Quaternionf rotation = gameItem.getRotation();
-        return modelMatrix.translationRotateScale(
-                gameItem.getPosition().x, gameItem.getPosition().y, gameItem.getPosition().z,
-                rotation.x, rotation.y, rotation.z, rotation.w,
-                gameItem.getScale().x, gameItem.getScale().y, gameItem.getScale().z);
+    public Matrix4f buildModelMatrix(GameObject gameObject) {
+        Vector3f position = gameObject.getPosition();
+        Vector3f scale = gameObject.getTransform().getScale();
+        Quaternionf rotation = gameObject.getTransform().getRotation();
+        return modelMatrix.translationRotateScale(position.x(), position.y(), position.z(), rotation.x(), rotation.y(), rotation.z(), rotation.w(), scale.x(), scale.y(), scale.z());
     }
 
     public Matrix4f buildModelViewMatrix(GameObject gameItem, Matrix4f viewMatrix) {

@@ -1,8 +1,7 @@
 package com.horizon.engine.graphics.object.terrain;
 
-import com.horizon.engine.debug.Debugger;
+import com.horizon.engine.common.Color;
 import lombok.Data;
-import lombok.Getter;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
@@ -13,15 +12,18 @@ public @Data class TerrainSquare {
     private final Vector2f squareIndex;
     private final int squareId;
 
+    private Color color;
+
     private TerrainCorner bottomLeftCorner;
     private TerrainCorner bottomRightCorner;
     private TerrainCorner topRightCorner;
     private TerrainCorner topLeftCorner;
 
-    public TerrainSquare(Terrain terrain, Vector2f squareIndex,  Vector3f position) {
+    public TerrainSquare(Terrain terrain, Vector2f squareIndex,  Vector3f position, Color color) {
         this.terrain = terrain;
         this.squareIndex = squareIndex;
         this.position = position;
+        this.color = color;
         this.squareId = calculateSquareId();
 
         createCorners();
@@ -82,23 +84,6 @@ public @Data class TerrainSquare {
                 topRightCorner = new TerrainCorner(squareIndex, topRight, (squareId == 0 ? 0 : squareId * 4) + 2);
                 topLeftCorner = leftSquare.getTopRightCorner().clone();
             }
-        }
-    }
-
-    public @Data class TerrainCorner {
-
-        private final Vector2f squareIndex;
-        private final Vector3f position;
-        private final int indice;
-
-        public TerrainCorner(Vector2f squareIndex, Vector3f position, int indice) {
-            this.squareIndex = squareIndex;
-            this.position = position;
-            this.indice = indice;
-        }
-
-        public TerrainCorner clone() {
-            return new TerrainCorner(new Vector2f(squareIndex), new Vector3f(position), indice);
         }
     }
 }

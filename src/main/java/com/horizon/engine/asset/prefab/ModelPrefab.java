@@ -10,6 +10,13 @@ import com.horizon.engine.graphics.texture.Texture;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Model Prefab is used to create prefab with mesh data and automatically
+ * create mesh from it in <code>instantiateObject()</code> function.
+ * In future releases it can be reworked to work with mesh itself.
+ *
+ * @author Horizon
+ */
 public class ModelPrefab extends Prefab {
 
     @Getter private final GameEngine gameEngine;
@@ -28,6 +35,8 @@ public class ModelPrefab extends Prefab {
     public GameObject instantiateObject() {
         ModelObject modelObject = new ModelObject(gameEngine, getGameEngine().getScene().generateObjectName(name));
         Mesh mesh = meshData.createMesh();
+
+        addParameters(modelObject);
 
         mesh.setMaterial(material == null ? new Material(new Texture("src/textures/error.png")) : material);
         modelObject.addComponent(mesh);

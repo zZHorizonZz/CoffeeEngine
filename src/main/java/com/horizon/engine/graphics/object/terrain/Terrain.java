@@ -2,24 +2,27 @@ package com.horizon.engine.graphics.object.terrain;
 
 import com.horizon.engine.GameEngine;
 import com.horizon.engine.common.Color;
+import com.horizon.engine.common.ColorPalette;
 import com.horizon.engine.common.UtilDataStore;
-import com.horizon.engine.common.UtilMath;
+import com.horizon.engine.common.UtilNormalGenerator;
 import com.horizon.engine.common.random.PerlinNoise;
-import com.horizon.engine.component.component.mesh.Mesh;
+import com.horizon.engine.component.component.generator.BiomeGenerator;
+import com.horizon.engine.component.component.mesh.TerrainMesh;
 import com.horizon.engine.debug.Debugger;
 import com.horizon.engine.graphics.data.Material;
 import com.horizon.engine.graphics.object.GameObject;
-import com.horizon.kingdom_builder.data.GamePalette;
 import lombok.Getter;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class Terrain extends GameObject {
 
-    @Getter private PerlinNoise perlinNoise;
+    @Getter private PerlinNoise heightNoise;
+    @Getter private BiomeGenerator biomeGenerator;
 
     @Getter private final int xSize;
     @Getter private final int zSize;
@@ -27,13 +30,19 @@ public class Terrain extends GameObject {
     protected int xVertexCount;
     protected int zVertexCount;
 
-    @Getter private final float size = 1.0f;
+    private final float[][] heightMap;
+
+    @Getter private final float size = 10.0f;
     @Getter private final Map<Vector2f, TerrainSquare> terrainSquareMap = new HashMap<>();
 
     public Terrain(GameEngine gameEngine, String terrainName, int xSize, int zSize) {
+        this(gameEngine, terrainName, xSize, zSize, new PerlinNoise(5f, 3, 0.3f, 589454546), new ColorPalette(new Color[]{new Color(240.0f, 250.0f, 255.0f)}));
+    }
+
+    public Terrain(GameEngine gameEngine, String terrainName, int xSize, int zSize, PerlinNoise heightNoise, ColorPalette biomePalette) {
         super(gameEngine, terrainName);
 
-        this.perlinNoise = new PerlinNoise(5f, 3, 0.3f, 589454546);
+        this.heightNoise = heightNoise;
 
         this.xSize = xSize;
         this.zSize = zSize;
@@ -41,9 +50,12 @@ public class Terrain extends GameObject {
         this.xVertexCount = xSize * 2;
         this.zVertexCount = zSize * 2;
 
+        this.heightMap = this.heightNoise.generateHeights(xSize);
+        this.biomeGenerator = new BiomeGenerator(biomePalette, this);
+
         Debugger.log("Terrain", "Generating terrain mesh...");
 
-        Mesh terrainMesh = generateTerrain();
+        TerrainMesh terrainMesh = generateTerrain();
         terrainMesh.setMaterial(new Material(Color.WHITE));
         addComponent(terrainMesh);
 
@@ -63,18 +75,24 @@ public class Terrain extends GameObject {
      * Heights of the terrain are based on the Perlin noise.
      * @return - Terrain mesh
      */
-    public Mesh generateTerrain() {
+    public TerrainMesh generateTerrain() {
         float[] vertices = new float[(zVertexCount * xSize) * 9];
-        float[] textureCoordinates = new float[(zVertexCount * xSize) * 4];
-        float[] normals = new float[(zVertexCount * xSize) * 3];
+        float[] colors = new float[(zVertexCount * xSize) * 8];
+        float[] normals = new float[(zVertexCount * xSize) * 8];
         int[] indices = new int[(zVertexCount * xSize) * 3];
 
         for(int x = 0; x < xSize; x++) {
             for(int z = 0; z < zSize; z++) {
-                TerrainSquare square = new TerrainSquare(this, new Vector2f(x, z), new Vector3f(x == 0 ? 0 : size * x, 0 + perlinNoise.getHeight(x, z), z == 0 ? 0 : size * z));
+                TerrainSquare square = new TerrainSquare(this, new Vector2f(x, z),
+                        new Vector3f(x == 0 ? 0 : size * x,
+                                0 + getHeight(x, z),
+                                z == 0 ? 0 : size * z),
+                        null);
+
+                square.setColor(biomeGenerator.getColors()[square.getSquareId()]);
 
                 storeSquareVertices(vertices, square);
-                storeSquareTexture(textureCoordinates, square);
+                storeSquareColors(colors, square);
                 storeSquareNormals(normals, square);
                 storeSquareIndices(indices, square);
 
@@ -82,47 +100,50 @@ public class Terrain extends GameObject {
             }
         }
 
-        return new Mesh(vertices, textureCoordinates, normals, indices);
+        return new TerrainMesh(vertices, colors, normals, indices);
     }
 
     private void storeSquareVertices(float[] vertices, TerrainSquare square) {
         int index = 0;
         int position = square.getSquareId() == 0 ? 0 : square.getSquareId() * 12;
 
-        UtilDataStore.storeCorner(position, vertices, square.getBottomLeftCorner().getPosition());
+        UtilDataStore.storeVector3f(position, vertices, square.getBottomLeftCorner().getPosition());
         index += 3;
 
-        UtilDataStore.storeCorner(position + index, vertices, square.getBottomRightCorner().getPosition());
+        UtilDataStore.storeVector3f(position + index, vertices, square.getBottomRightCorner().getPosition());
         index += 3;
 
-        UtilDataStore.storeCorner(position + index, vertices, square.getTopRightCorner().getPosition());
+        UtilDataStore.storeVector3f(position + index, vertices, square.getTopRightCorner().getPosition());
         index += 3;
 
-        UtilDataStore.storeCorner(position + index, vertices, square.getTopLeftCorner().getPosition());
+        UtilDataStore.storeVector3f(position + index, vertices, square.getTopLeftCorner().getPosition());
     }
 
-    private void storeSquareTexture(float[] texture, TerrainSquare square) {
+    private void storeSquareColors(float[] colors, TerrainSquare square) {
         int index = 0;
-        int position = square.getSquareId() == 0 ? 0 : square.getSquareId() * 4;
+        int position = square.getSquareId() == 0 ? 0 : square.getSquareId() * 16;
 
-        texture[position + index++] = square.getBottomLeftCorner().getPosition().x();
-        texture[position + index++] = square.getBottomLeftCorner().getPosition().z();
+        Vector4f color = square.getColor().toVector4f();
 
-        texture[position + index++] = square.getTopRightCorner().getPosition().x();
-        texture[position + index] = square.getTopRightCorner().getPosition().z();
+        UtilDataStore.storeVector4f(position, colors, color);
+        index += 4;
+        UtilDataStore.storeVector4f(position + index, colors, color);
+        index += 4;
+        UtilDataStore.storeVector4f(position + index, colors, color);
+        index += 4;
+        UtilDataStore.storeVector4f(position + index, colors, color);
     }
 
     private void storeSquareNormals(float[] normals, TerrainSquare square) {
-        Vector3f normalTopLeft = UtilMath.calculateNormal(square.getBottomLeftCorner().getPosition(), square.getBottomRightCorner().getPosition(), square.getTopRightCorner().getPosition());
-        Vector3f normalBottomRight = UtilMath.calculateNormal(square.getTopRightCorner().getPosition(), square.getTopLeftCorner().getPosition(), square.getBottomLeftCorner().getPosition());
+        Vector4f normalTopLeft = new Vector4f(UtilNormalGenerator.calculateNormal((int) square.getSquareIndex().x(), (int) square.getSquareIndex().y(), heightMap), 0);
+        Vector4f normalBottomRight = new Vector4f(UtilNormalGenerator.calculateNormal((int) square.getSquareIndex().x(), (int) square.getSquareIndex().y(), heightMap), 0);
 
         int index = 0;
-        int position = square.getSquareId() == 0 ? 0 : square.getSquareId() * 6;
+        int position = square.getSquareId() == 0 ? 0 : square.getSquareId() * 8;
 
-        UtilDataStore.storeCorner(position, normals, normalTopLeft);
-        index += 3;
-
-        UtilDataStore.storeCorner(position + index, normals, normalBottomRight);
+        UtilDataStore.storeVector4f(position, normals, normalBottomRight);
+        index += 4;
+        UtilDataStore.storeVector4f(position + index, normals, normalTopLeft);
     }
 
     private void storeSquareIndices(int[] vertices, TerrainSquare square) {
@@ -140,6 +161,6 @@ public class Terrain extends GameObject {
     }
 
     public float getHeight(int x, int z) {
-        return perlinNoise.getHeight(x, z);
+        return heightMap[x][z];
     }
 }

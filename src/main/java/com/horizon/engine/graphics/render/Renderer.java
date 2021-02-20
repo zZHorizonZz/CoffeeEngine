@@ -101,10 +101,6 @@ public class Renderer {
         if(!scene.getGameEngine().getGameLogic().isSceneInitialized())
             return;
 
-        if(terrainShader.getTerrain() == null) {
-            terrainShader.setTerrain(scene.getTerrain());
-        }
-
         graphicShader.render(window, camera, scene, canvas);
         terrainShader.render(window, camera, scene, canvas);
         hudShader.render(window, camera, scene, canvas);

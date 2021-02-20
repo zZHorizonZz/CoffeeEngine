@@ -1,13 +1,13 @@
 package com.horizon.engine.graphics.object.scene;
 
 import com.horizon.engine.GameEngine;
+import com.horizon.engine.common.Color;
 import com.horizon.engine.component.Component;
 import com.horizon.engine.component.ComponentType;
 import com.horizon.engine.component.component.light.DirectionalLightComponent;
 import com.horizon.engine.component.component.light.PointLightComponent;
 import com.horizon.engine.component.component.light.SpotLightComponent;
 import com.horizon.engine.data.ApplicationData;
-import com.horizon.engine.debug.Debugger;
 import com.horizon.engine.graphics.light.DirectionalLight;
 import com.horizon.engine.graphics.light.PointLight;
 import com.horizon.engine.graphics.light.SpotLight;
@@ -19,7 +19,8 @@ import com.horizon.engine.graphics.object.terrain.Terrain;
 import com.horizon.engine.graphics.postprocessing.Fog;
 import lombok.Data;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public @Data class Scene {
 
@@ -38,7 +39,7 @@ public @Data class Scene {
         this.gameEngine = gameEngine;
         this.sceneLight = new SceneLight();
 
-        getSceneLight().setDirectionalLight(new DirectionalLight(gameEngine));
+        getSceneLight().setDirectionalLight(new DirectionalLight(gameEngine, new Color(240.0f, 230.0f, 180.0f)));
 
         DirectionalLightComponent directionalLightComponent = getSceneLight().getDirectionalLight().getDirectionalLight();
 
@@ -55,6 +56,13 @@ public @Data class Scene {
         return true;
     }
 
+    /**
+     * Instantiate function provides initialization of inserted gameobject.
+     * Object is automatically inserted into asset manager if that gameobject
+     * contains mesh.
+     * @param gameObject - GameObject that will be initialized.
+     * @return - Inserted GameObject.
+     */
     public GameObject instantiate(GameObject gameObject) {
         if(gameObject.getComponents().containsKey(ComponentType.LIGHT)) {
             Component component = gameObject.getComponents().get(ComponentType.LIGHT);
@@ -71,19 +79,25 @@ public @Data class Scene {
             }
         }
 
+        gameObject.setGameObjectName(sceneObjects.containsKey(gameObject.getGameObjectName()) ? generateObjectName(gameObject.getGameObjectName()) : gameObject.getGameObjectName());
+        sceneObjects.put(gameObject.getGameObjectName(), gameObject);
+
         if(gameObject instanceof Terrain) {
             terrain = (Terrain) gameObject;
             return gameObject;
         }
 
-        gameObject.setGameObjectName(sceneObjects.containsKey(gameObject.getGameObjectName()) ? generateObjectName(gameObject.getGameObjectName()) : gameObject.getGameObjectName());
-
         getGameEngine().getAssetManager().addMesh(gameObject);
-        sceneObjects.put(gameObject.getGameObjectName(), gameObject);
 
         return gameObject;
     }
 
+    /**
+     * This function is used for creation of primitive object like cube,
+     * cone, ball, plane, etc.
+     * @param primitiveObject - Type of primitive object.
+     * @return - GameObject (Model Object)
+     */
     public ModelObject instantiate(PrimitiveObject primitiveObject) {
         return (ModelObject) instantiate(getGameEngine().getAssetManager().getModel(primitiveObject.getMeshName()).instantiateObject());
     }

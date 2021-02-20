@@ -43,6 +43,7 @@ public class AssetManager extends AbstractManager {
         loadPrimitives();
     }
 
+    //TODO this can be done with xml file or something like that.
     public void loadPrimitives() {
         Debugger.log(getManagerName(), "Loading primitives...");
         loadModel("/models", "cube.obj");

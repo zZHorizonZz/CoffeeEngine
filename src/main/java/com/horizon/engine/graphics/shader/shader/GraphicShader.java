@@ -209,7 +209,6 @@ public class GraphicShader extends MeshShader {
 
             getRenderer().getDepthShader().bindTextures(GL_TEXTURE2);
 
-            //setUniform("selectedNonInstanced", gameItem.isSelected() ? 1.0f : 0.0f);
             Matrix4f modelMatrix = transformation.buildModelMatrix(gameObject);
             setUniformMatrix4("modelNonInstancedMatrix", modelMatrix);
 

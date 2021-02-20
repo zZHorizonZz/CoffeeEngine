@@ -76,7 +76,7 @@ public class GameEngine implements Runnable {
 
         //Final initialization
         gameLogic.setGameEngine(this);
-        gameLogic.initialize();
+        gameLogic.onEnable();
 
         postInitialize();
     }
@@ -107,6 +107,7 @@ public class GameEngine implements Runnable {
         boolean running = true;
 
         while (running && !window.windowShouldClose()) {
+            long startDeltaTime = System.currentTimeMillis();
             elapsedTime = timer.getElapsedTime();
             accumulator += elapsedTime;
 
@@ -124,6 +125,9 @@ public class GameEngine implements Runnable {
             }
 
             updateFramesPerSecond();
+
+            startDeltaTime = System.currentTimeMillis() - startDeltaTime;
+            timer.setDeltaTime(startDeltaTime / 1000.0f);
         }
     }
 
@@ -154,7 +158,9 @@ public class GameEngine implements Runnable {
     }
 
     protected void cleanup() {
-        gameLogic.cleanup();
+        gameLogic.cleanup(getGameLogic().getRenderer());
+
+        gameLogic.onDisable();
     }
 
     protected void updateFramesPerSecond() {

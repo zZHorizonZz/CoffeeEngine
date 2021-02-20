@@ -1,8 +1,12 @@
 package com.horizon.engine;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class Timer {
 
     private double lastLoopTime;
+    @Getter @Setter private float deltaTime;
 
     public void init() {
         lastLoopTime = getTime();
